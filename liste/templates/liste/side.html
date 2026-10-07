@@ -11,10 +11,12 @@
   <main class="wrap">
     <h1>🛒 Handleliste</h1>
     
-    <p class="del-label">Del denne lenken med de du handler med:</p>
-    <div class="del-row">
-      <code class="del-link" id="sl-link-text">{{ request.build_absolute_uri }}</code>
-      <button id="sl-copy-link" class="btn-copy-link" type="button">Kopier</button>
+    <div class="del-card">
+      <p class="del-label">Del denne lenken med de du handler med:</p>
+      <div class="del-row">
+        <code class="del-link" id="sl-link-text">{{ request.build_absolute_uri }}</code>
+        <button id="sl-copy-link" class="btn-copy-link" type="button">Kopier</button>
+      </div>
     </div>
 
       <div class="sl-widget" id="sl-widget" data-liste-id="{{ lid }}">
