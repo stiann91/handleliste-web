@@ -255,3 +255,38 @@ h1 { font-size: 1.8rem; margin: 0 0 12px; }
           transition: opacity 0.2s ease, transform 0.2s ease;
         }
         .sl-toast.sl-show { opacity: 1; transform: translateY(-14px); }
+
+.page-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 12px; }
+.page-header h1 { margin: 0; }
+
+.info-btn {
+  flex-shrink: 0;
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: #f0eee9;
+  font-size: 0.8rem;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.info-btn:hover { background: rgba(255,255,255,0.14); }
+
+.tilbake-lenke { color: #f0eee9; opacity: 0.8; text-decoration: none; font-size: 0.85rem; }
+.tilbake-lenke:hover { opacity: 1; }
+
+.om-boks {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-bottom: 12px;
+}
+.om-boks summary {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+}
+.om-innhold { margin-top: 10px; font-size: 0.9rem; line-height: 1.5; opacity: 0.9; }
+.om-innhold p { margin: 0 0 10px; }
+.om-innhold p:last-child { margin-bottom: 0; }
