@@ -1,0 +1,49 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Om siden – Handleliste</title>
+  <link rel="stylesheet" href="{% static 'liste/liste.css' %}">
+</head>
+<body>
+  <main class="wrap">
+    <h1>ℹ️ Om siden</h1>
+    <p class="del-label"><a href="/" class="tilbake-lenke">← Tilbake til forsiden</a></p>
+
+    <details class="om-boks" open>
+      <summary>Hvordan det er bygget</summary>
+      <div class="om-innhold">
+        <p>Siden kjører på en Ubuntu-server hos Oracle Cloud (Always Free-tier). Koden ligger på GitHub, og endringer rulles automatisk ut til serveren når de blir godkjent.</p>
+        <p>Når du skanner en strekkode, slås den opp mot Open Food Facts, en åpen og gratis produktdatabase. Oppslag lagres i en liten mellomlagring, så samme vare ikke trenger å slås opp på nytt hver gang.</p>
+        <p>Serveren tåler i dag rundt 20–30 personer som bruker appen aktivt samtidig. Hvis flere begynner å bruke den, kan kapasiteten økes ved behov.</p>
+      </div>
+    </details>
+
+    <details class="om-boks">
+      <summary>Hvorfor det er bygget</summary>
+      <div class="om-innhold">
+        <p>Jeg trengte en enkel, delt handleliste som kona og jeg kunne bruke sammen, uten å måtte installere en egen app eller opprette brukerkontoer.</p>
+      </div>
+    </details>
+
+    <details class="om-boks">
+      <summary>Funksjonene</summary>
+      <div class="om-innhold">
+        <p><strong>Ikonene:</strong> idéen kom fra at jeg tidligere brukte ColorNote som handleliste. Der hadde jeg ikoner på varene, slik at sønnen min, som da var 3 år, kunne se hva vi skulle kjøpe, selv om han ikke kunne lese ennå.</p>
+        <p><strong>Strekkodeskanning:</strong> hold kameraet mot strekkoden, så fylles varenavnet inn automatisk.</p>
+        <p><strong>Del lenke:</strong> alle med lenken kan se og endre listen. Praktisk for en husstand som handler sammen.</p>
+      </div>
+    </details>
+
+    <details class="om-boks">
+      <summary>Tips til forbedringer</summary>
+      <div class="om-innhold">
+        <p>Har du forslag eller finner noe som ikke fungerer? Send meg gjerne en e-post:</p>
+        <p><a href="mailto:stiann91@gmail.com" class="knapp-lenke">stiann91@gmail.com</a></p>
+      </div>
+    </details>
+  </main>
+</body>
+</html>
