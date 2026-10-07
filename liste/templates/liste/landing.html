@@ -9,7 +9,10 @@
 </head>
 <body>
   <main class="wrap">
-    <h1>🛒 Handleliste</h1>
+    <div class="page-header">
+      <h1>🛒 Handleliste</h1>
+      <a href="{% url 'om' %}" class="info-btn">ℹ️ Om siden</a>
+    </div>
     <p>Lag en liste og del lenken med dem du handler med.</p>
     <form method="post" action="{% url 'ny' %}">
       {% csrf_token %}
