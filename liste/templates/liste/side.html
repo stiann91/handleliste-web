@@ -1,0 +1,107 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Handleliste</title>
+  <link rel="stylesheet" href="{% static 'liste/liste.css' %}">
+</head>
+<body>
+  <main class="wrap">
+    <h1>🛒 Handleliste</h1>
+    
+    <p class="del-label">Del denne lenken med de du handler med:</p>
+    <div class="del-row">
+      <code class="del-link" id="sl-link-text">{{ request.build_absolute_uri }}</code>
+      <button id="sl-copy-link" class="btn-copy-link" type="button">Kopier</button>
+    </div>
+
+      <div class="sl-widget" id="sl-widget" data-liste-id="{{ lid }}">
+            <div class="sl-inputrow">
+              <div class="sl-input-wrap">
+                <input
+                  type="text"
+                  id="sl-input"
+                  class="sl-input"
+                  placeholder="Legg til vare …"
+                  autocomplete="off"
+                />
+                <ul id="sl-suggestions" class="sl-suggestions" hidden></ul>
+              </div>
+              <button id="sl-add" class="sl-btn sl-btn-add" type="button">Legg til</button>
+            </div>
+
+            <div class="sl-divider"><span>eller</span></div>
+            <button id="sl-scan" class="sl-btn sl-btn-scan" type="button">📷 Skann strekkode</button>
+
+            <div id="sl-scanner" style="max-width:360px;" hidden></div>
+
+            <ul id="sl-list" class="sl-list"></ul>
+
+            <p id="sl-empty" class="sl-empty">Handlelisten er tom. Skriv noe over for å legge til.</p>
+
+            <div class="sl-secondary-actions">
+              <button id="sl-sort" class="sl-btn sl-btn-ghost sl-btn-sort" type="button">Sorter etter butikk</button>
+            </div>
+
+
+            <div class="sl-actions">
+              <button id="sl-copy" class="sl-btn sl-btn-ghost" type="button">Kopier til utklippstavle</button>
+              <button id="sl-clear" class="sl-btn sl-btn-danger" type="button">Tøm listen</button>
+            </div>
+
+            <div id="sl-toast" class="sl-toast" role="status" aria-live="polite"></div>
+          </div>
+  </main>
+  <footer class="fot">Aktive enheter siste 24 timer: {{ aktive_siste_dogn }}</footer>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+  <script src="{% static 'liste/liste.js' %}"></script>
+  
+
+  <script>
+    (function () {
+      var btn = document.getElementById("sl-copy-link");
+      var text = document.getElementById("sl-link-text");
+      if (!btn || !text) return;
+
+      function visKopiert() {
+        var original = btn.textContent;
+        btn.textContent = "Kopiert!";
+        setTimeout(function () { btn.textContent = original; }, 1500);
+      }
+
+      function reserveKopiering(verdi) {
+        var midlertidig = document.createElement("textarea");
+        midlertidig.value = verdi;
+        midlertidig.style.position = "fixed";
+        midlertidig.style.opacity = "0";
+        document.body.appendChild(midlertidig);
+        midlertidig.focus();
+        midlertidig.select();
+        try {
+          document.execCommand("copy");
+          visKopiert();
+        } catch (e) {
+          btn.textContent = "Kunne ikke kopiere";
+        }
+        document.body.removeChild(midlertidig);
+      }
+
+      btn.addEventListener("click", function () {
+        var verdi = text.textContent.trim();
+        if (navigator.clipboard && window.isSecureContext) {
+          navigator.clipboard.writeText(verdi).then(visKopiert).catch(function () {
+            reserveKopiering(verdi);
+          });
+        } else {
+          reserveKopiering(verdi);
+        }
+      });
+    })();
+  </script>
+
+
+
+</body>
+</html>

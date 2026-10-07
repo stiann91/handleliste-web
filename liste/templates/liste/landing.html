@@ -1,0 +1,21 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Handleliste</title>
+  <link rel="stylesheet" href="{% static 'liste/liste.css' %}">
+</head>
+<body>
+  <main class="wrap">
+    <h1>🛒 Handleliste</h1>
+    <p>Lag en liste og del lenken med dem du handler med.</p>
+    <form method="post" action="{% url 'ny' %}">
+      {% csrf_token %}
+      <button class="knapp" type="submit">Ny handleliste</button>
+    </form>
+  </main>
+  <footer class="fot">Aktive enheter siste 24 timer: {{ aktive_siste_dogn }}</footer>
+</body>
+</html>
