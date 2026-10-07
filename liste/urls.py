@@ -9,4 +9,5 @@ urlpatterns = [
     path("api/liste/<uuid:lid>/", views.liste_hent, name="liste-hent"),
     path("api/liste/<uuid:lid>/lagre/", views.liste_lagre, name="liste-lagre"),
     path("api/barcode/<str:kode>/", views.barcode_lookup, name="barcode"),
+    path("om/", views.om, name="om"),
 ]
