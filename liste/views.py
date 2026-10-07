@@ -103,3 +103,6 @@ def barcode_lookup(request, kode):
     if resultat is None:
         return JsonResponse({"funnet": False}, status=404)
     return JsonResponse({"funnet": True, **resultat})
+
+def om(request):
+    return render(request, "liste/om.html")
