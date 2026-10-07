@@ -12,27 +12,35 @@ h1 { font-size: 1.8rem; margin: 0 0 12px; }
 
 
 
-.del-label { font-size: 0.85rem; opacity: 0.75; margin-bottom: 6px; }
-
-
-.del-row { display: flex; align-items: center; gap: 8px; margin: 0 18px 16px 0; }
-
-
-
+.del-card {
+  max-width: 480px;
+  margin: 0 0 16px;
+  padding: 14px 18px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 15px;
+  box-sizing: border-box;
+}
+.del-label { font-size: 0.8rem; opacity: 0.75; margin: 0 0 8px; }
+.del-row { display: flex; align-items: center; gap: 8px; }
 .del-link {
   flex: 1;
-  font-size: 0.6rem;
-  opacity: 0.75;
-  word-break: break-all;
+  min-width: 0;
+  font-size: 0.75rem;
+  opacity: 0.85;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .btn-copy-link {
   flex-shrink: 0;
-  padding: 8px 12px;
+  padding: 8px 14px;
   border-radius: 8px;
   background: rgba(255,255,255,0.08);
   border: 1px solid rgba(255,255,255,0.15);
   color: #f0eee9;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
 }
