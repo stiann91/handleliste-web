@@ -9,8 +9,55 @@ body {
 }
 .wrap { max-width: 520px; margin: 0 auto; padding: 24px 16px 60px; }
 h1 { font-size: 1.8rem; margin: 0 0 12px; }
-.del { font-size: 0.85rem; opacity: 0.75; word-break: break-all; }
-.del code { font-size: 0.8rem; }
+.page-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 12px; }
+.page-header h1 { margin: 0; }
+
+.info-btn {
+  flex-shrink: 0;
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: #f0eee9;
+  font-size: 0.8rem;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.info-btn:hover { background: rgba(255,255,255,0.14); }
+
+.del-card {
+  max-width: 480px;
+  margin: 0 0 16px;
+  padding: 14px 18px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 15px;
+  box-sizing: border-box;
+}
+.del-label { font-size: 0.8rem; opacity: 0.75; margin: 0 0 8px; }
+.del-row { display: flex; align-items: center; gap: 8px; }
+.del-link {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.75rem;
+  opacity: 0.85;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.btn-copy-link {
+  flex-shrink: 0;
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: #f0eee9;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.btn-copy-link:hover { background: rgba(255,255,255,0.14); }
 .knapp, .knapp-lenke {
   display: inline-block; padding: 12px 18px; border-radius: 10px;
   background: #f1c40f; color: #000; font-weight: 600; border: 0;
@@ -43,6 +90,31 @@ h1 { font-size: 1.8rem; margin: 0 0 12px; }
         #sl-widget * { box-sizing: border-box; }
 
         .sl-inputrow { display: flex; gap: 8px; align-items: flex-start; }
+        .sl-divider {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          margin: 12px 0;
+          color: var(--sl-muted);
+          font-size: 13px;
+        }
+        .sl-divider::before,
+        .sl-divider::after {
+          content: "";
+          flex: 1;
+          height: 1px;
+          background: var(--sl-border);
+        }
+        .sl-btn-scan {
+          width: 100%;
+          background: transparent;
+          border-color: var(--sl-border);
+          color: var(--sl-text);
+          margin-bottom: 12px;
+          font-size: 15px;
+          padding: 9px 12px;
+        }
+        .sl-btn-scan:hover { background: rgba(255,255,255,0.06); }
         .sl-input-wrap { position: relative; flex: 1; }
 
         .sl-input {
