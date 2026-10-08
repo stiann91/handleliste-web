@@ -38,6 +38,13 @@ var ENHET_ID = (function () {
     "meieri", "drikke", "tørrmat", "is", "godteri", "annet"
   ];
 
+  var CATEGORY_LABELS = {
+    "frukt": "Frukt", "grønnsaker": "Grønnsaker", "brød": "Brød",
+    "kaffe": "Kaffe", "melk": "Melk", "juice": "Juice",
+    "meieri": "Meieri", "drikke": "Drikke", "tørrmat": "Tørrmat",
+    "is": "Is", "godteri": "Godteri", "annet": "Annet"
+  };
+
   // Nøkkelord -> [ikon, kategori]. Lengste nøkkel matches først.
   var ITEM_DB = {
     "eple": ["🍎", "frukt"], "epler": ["🍎", "frukt"],
