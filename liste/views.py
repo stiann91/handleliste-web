@@ -41,6 +41,7 @@ def _rens_item(i):
         "icon": str(i.get("icon") or "")[:20],
         "category": str(i.get("category") or "")[:50],
         "qty": qty,
+        "plukket": bool(i.get("plukket")),
     }
 
 
@@ -58,6 +59,7 @@ def _rens_tur(t):
 
 def om(request):
     return render(request, "liste/om.html")
+
 
 def landing(request):
     return render(request, "liste/landing.html", {"aktive_siste_dogn": _aktive_siste_dogn()})
