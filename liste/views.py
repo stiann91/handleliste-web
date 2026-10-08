@@ -56,6 +56,9 @@ def _rens_tur(t):
     }
 
 
+def om(request):
+    return render(request, "liste/om.html")
+
 def landing(request):
     return render(request, "liste/landing.html", {"aktive_siste_dogn": _aktive_siste_dogn()})
 
