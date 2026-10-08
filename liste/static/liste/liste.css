@@ -1,7 +1,7 @@
 /* Frittstående handleliste-side */
 body {
   font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-  background: #4a5070;
+  background: #6b4a35;
   color: #f0eee9;
   margin: 0;
   min-height: 100svh;
@@ -191,9 +191,19 @@ h1 { font-size: 1.8rem; margin: 0 0 12px; }
           border: 1px solid var(--sl-border);
           border-radius: 8px;
           font-size: 15px;
+          cursor: pointer;
         }
         .sl-item-icon { font-size: 17px; width: 20px; text-align: center; flex-shrink: 0; }
         .sl-item-name { flex: 1; word-break: break-word; }
+
+        .sl-item-plukket {
+          background: rgba(74, 222, 128, 0.18);
+          border-color: rgba(74, 222, 128, 0.45);
+        }
+        .sl-item-plukket .sl-item-name {
+          text-decoration: line-through;
+          opacity: 0.7;
+        }
 
         .sl-qty { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
         .sl-qty-btn {
