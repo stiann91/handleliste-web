@@ -103,11 +103,6 @@ var ENHET_ID = (function () {
   }
   function guessIcon(name) { return guessInfo(name).icon; }
 
-  function categoryRank(category) {
-    var idx = CATEGORY_ORDER.indexOf(category);
-    return idx === -1 ? CATEGORY_ORDER.length : idx;
-  }
-
   function fetchState() {
     return fetch(GET_URL, { credentials: "same-origin", headers: { "X-Enhet-ID": ENHET_ID } })
       .then(function (res) { if (!res.ok) throw new Error("GET feilet"); return res.json(); })
@@ -117,7 +112,8 @@ var ENHET_ID = (function () {
             name: i.name,
             icon: typeof i.icon !== "undefined" ? i.icon : guessInfo(i.name).icon,
             category: i.category || guessInfo(i.name).category,
-            qty: i.qty || 1
+            qty: i.qty || 1,
+            plukket: !!i.plukket
           };
         });
         var loadedTurer = (Array.isArray(data.turer) ? data.turer : []).map(function (t) {
@@ -167,7 +163,6 @@ var ENHET_ID = (function () {
   var $suggestions = document.getElementById("sl-suggestions");
   var $copy = document.getElementById("sl-copy");
   var $clear = document.getElementById("sl-clear");
-  var $sort = document.getElementById("sl-sort");
   var $toast = document.getElementById("sl-toast");
   var $turerSection = document.getElementById("sl-turer");
   var $turerList = document.getElementById("sl-turer-list");
@@ -176,7 +171,13 @@ var ENHET_ID = (function () {
 
   function buildItemRow(item, index) {
     var li = document.createElement("li");
-    li.className = "sl-item";
+    li.className = "sl-item" + (item.plukket ? " sl-item-plukket" : "");
+    li.addEventListener("click", function (e) {
+      if (e.target.closest("button")) return;
+      item.plukket = !item.plukket;
+      saveState();
+      render();
+    });
 
     var icon = document.createElement("span");
     icon.className = "sl-item-icon";
@@ -241,14 +242,19 @@ var ENHET_ID = (function () {
   function render() {
     $list.innerHTML = "";
 
-    // Grupper varene etter kategori, i butikk-rekkefølge, uten å endre
-    // rekkefølgen i den underliggende listen (den styres av sortByStore).
+    // Grupper de ikke-plukkede varene etter kategori, i butikk-rekkefølge,
+    // alfabetisk sortert innad i hver gruppe. Dette er bare en visningsrekkefølge,
+    // den underliggende items-listen (og indeksene brukt i knappene) endres ikke.
     CATEGORY_ORDER.forEach(function (cat) {
       var indekser = [];
       items.forEach(function (item, i) {
-        if ((item.category || "annet") === cat) indekser.push(i);
+        if (!item.plukket && (item.category || "annet") === cat) indekser.push(i);
       });
       if (indekser.length === 0) return;
+
+      indekser.sort(function (a, b) {
+        return items[a].name.localeCompare(items[b].name, "no");
+      });
 
       var header = document.createElement("li");
       header.className = "sl-group-header";
@@ -259,6 +265,26 @@ var ENHET_ID = (function () {
         $list.appendChild(buildItemRow(items[i], i));
       });
     });
+
+    // Plukkede varer samles i en egen gruppe nederst, uavhengig av kategori.
+    var plukkedeIndekser = [];
+    items.forEach(function (item, i) {
+      if (item.plukket) plukkedeIndekser.push(i);
+    });
+    if (plukkedeIndekser.length > 0) {
+      plukkedeIndekser.sort(function (a, b) {
+        return items[a].name.localeCompare(items[b].name, "no");
+      });
+
+      var plukketHeader = document.createElement("li");
+      plukketHeader.className = "sl-group-header";
+      plukketHeader.textContent = "Plukket";
+      $list.appendChild(plukketHeader);
+
+      plukkedeIndekser.forEach(function (i) {
+        $list.appendChild(buildItemRow(items[i], i));
+      });
+    }
 
     $empty.classList.toggle("sl-hidden", items.length > 0);
     renderTurer();
@@ -317,23 +343,12 @@ var ENHET_ID = (function () {
       if (eksisterende) {
         eksisterende.qty += vare.qty;
       } else {
-        items.push({ name: vare.name, icon: vare.icon, category: vare.category, qty: vare.qty });
+        items.push({ name: vare.name, icon: vare.icon, category: vare.category, qty: vare.qty, plukket: false });
       }
     });
     saveState();
     render();
     showToast("Hentet tilbake " + tur.items.length + " varer");
-  }
-
-  function sortByStore() {
-    items.sort(function (a, b) {
-      var rankDiff = categoryRank(a.category) - categoryRank(b.category);
-      if (rankDiff !== 0) return rankDiff;
-      return a.name.localeCompare(b.name, "no");
-    });
-    saveState();
-    render();
-    showToast("Sortert etter butikk");
   }
 
   function addItem(rawName) {
@@ -345,7 +360,7 @@ var ENHET_ID = (function () {
       existing.qty += 1;
     } else {
       var info = guessInfo(name);
-      items.push({ name: name, icon: info.icon, category: info.category, qty: 1 });
+      items.push({ name: name, icon: info.icon, category: info.category, qty: 1, plukket: false });
     }
 
     var known = history.some(function (h) { return h.toLowerCase() === name.toLowerCase(); });
@@ -576,11 +591,6 @@ var ENHET_ID = (function () {
     saveState();
     render();
     showToast("Listen er tømt");
-  });
-
-  $sort.addEventListener("click", function () {
-    if (items.length < 2) return;
-    sortByStore();
   });
 
   function applyState(state) {
