@@ -9,7 +9,15 @@ body {
 }
 .wrap { max-width: 520px; margin: 0 auto; padding: 24px 16px 60px; }
 h1 { font-size: 1.8rem; margin: 0 0 12px; }
-.page-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 12px; }
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  max-width: 480px;
+  margin: 0 0 12px;
+  box-sizing: border-box;
+}
 .page-header h1 { margin: 0; }
 
 .info-btn {
