@@ -12,6 +12,7 @@ from .models import Besok, Handleliste
 
 MAKS_ELEMENTER = 300
 MAKS_TEKST = 200
+MAKS_TURER = 5
 
 
 def _enhet_id(request):
@@ -35,12 +36,23 @@ def _rens_item(i):
     qty = i.get("qty", 1)
     if not isinstance(qty, int) or not 1 <= qty <= 999:
         qty = 1
-
     return {
         "name": str(i.get("name") or "")[:MAKS_TEKST],
         "icon": str(i.get("icon") or "")[:20],
         "category": str(i.get("category") or "")[:50],
         "qty": qty,
+    }
+
+
+def _rens_tur(t):
+    if not isinstance(t, dict):
+        raise ValueError("Tur må være et objekt")
+    varer = t.get("items")
+    if not isinstance(varer, list) or len(varer) > MAKS_ELEMENTER:
+        raise ValueError("Ugyldige varer i tur")
+    return {
+        "dato": str(t.get("dato") or "")[:40],
+        "items": [_rens_item(v) for v in varer],
     }
 
 
@@ -71,7 +83,7 @@ def liste_hent(request, lid):
         return JsonResponse({"error": "Finnes ikke"}, status=404)
     Handleliste.objects.filter(pk=lid).update(sist_sett=timezone.now())
     _registrer_besok(request)
-    return JsonResponse({"items": liste.items, "history": liste.history})
+    return JsonResponse({"items": liste.items, "history": liste.history, "turer": liste.turer})
 
 
 @require_POST
@@ -82,17 +94,23 @@ def liste_lagre(request, lid):
         payload = json.loads(request.body.decode("utf-8"))
         items = payload.get("items")
         history = payload.get("history")
+        turer = payload.get("turer", [])
         if not isinstance(items, list) or not isinstance(history, list):
             raise ValueError("items og history må være lister")
+        if not isinstance(turer, list) or len(turer) > MAKS_TURER:
+            raise ValueError("For mange turer")
         if len(items) > MAKS_ELEMENTER or len(history) > MAKS_ELEMENTER:
             raise ValueError("For mange elementer")
         items = [_rens_item(i) for i in items]
         history = [str(h)[:MAKS_TEKST] for h in history]
+        turer = [_rens_tur(t) for t in turer]
     except (ValueError, UnicodeDecodeError, AttributeError):
         return JsonResponse({"error": "Ugyldig innhold"}, status=400)
 
     nå = timezone.now()
-    Handleliste.objects.filter(pk=lid).update(items=items, history=history, oppdatert=nå, sist_sett=nå)
+    Handleliste.objects.filter(pk=lid).update(
+        items=items, history=history, turer=turer, oppdatert=nå, sist_sett=nå
+    )
     _registrer_besok(request)
     return JsonResponse({"ok": True})
 
@@ -103,6 +121,3 @@ def barcode_lookup(request, kode):
     if resultat is None:
         return JsonResponse({"funnet": False}, status=404)
     return JsonResponse({"funnet": True, **resultat})
-
-def om(request):
-    return render(request, "liste/om.html")
