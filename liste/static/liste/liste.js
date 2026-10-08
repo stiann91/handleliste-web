@@ -120,9 +120,18 @@ var ENHET_ID = (function () {
             qty: i.qty || 1
           };
         });
+        var loadedTurer = (Array.isArray(data.turer) ? data.turer : []).map(function (t) {
+          return {
+            dato: t.dato || "",
+            items: (Array.isArray(t.items) ? t.items : []).map(function (i) {
+              return { name: i.name, icon: i.icon || "", category: i.category || "annet", qty: i.qty || 1 };
+            })
+          };
+        });
         return {
           items: loadedItems,
-          history: Array.isArray(data.history) ? data.history : []
+          history: Array.isArray(data.history) ? data.history : [],
+          turer: loadedTurer
         };
       })
   }
@@ -140,7 +149,7 @@ var ENHET_ID = (function () {
         "X-CSRFToken": getCookie("csrftoken"),
         "X-Enhet-ID": ENHET_ID
       },
-      body: JSON.stringify({ items: items, history: history })
+      body: JSON.stringify({ items: items, history: history, turer: turer })
     }).catch(function () {
       showToast("Kunne ikke lagre til serveren");
     });
@@ -148,6 +157,7 @@ var ENHET_ID = (function () {
 
   var items = [];
   var history = [];
+  var turer = [];
   var stateLoaded = false;
 
   var $input = document.getElementById("sl-input");
@@ -159,76 +169,160 @@ var ENHET_ID = (function () {
   var $clear = document.getElementById("sl-clear");
   var $sort = document.getElementById("sl-sort");
   var $toast = document.getElementById("sl-toast");
+  var $turerSection = document.getElementById("sl-turer");
+  var $turerList = document.getElementById("sl-turer-list");
 
   var activeSuggestionIndex = -1;
 
+  function buildItemRow(item, index) {
+    var li = document.createElement("li");
+    li.className = "sl-item";
+
+    var icon = document.createElement("span");
+    icon.className = "sl-item-icon";
+    icon.textContent = item.icon || "";
+
+    var name = document.createElement("span");
+    name.className = "sl-item-name";
+    name.textContent = item.name;
+
+    var qtyWrap = document.createElement("div");
+    qtyWrap.className = "sl-qty";
+
+    var minus = document.createElement("button");
+    minus.className = "sl-qty-btn";
+    minus.type = "button";
+    minus.textContent = "−";
+    minus.setAttribute("aria-label", "Færre " + item.name);
+    minus.addEventListener("click", function () {
+      item.qty -= 1;
+      if (item.qty < 1) items.splice(index, 1);
+      saveState();
+      render();
+    });
+
+    var qtyNum = document.createElement("span");
+    qtyNum.className = "sl-qty-num";
+    qtyNum.textContent = item.qty;
+
+    var plus = document.createElement("button");
+    plus.className = "sl-qty-btn";
+    plus.type = "button";
+    plus.textContent = "+";
+    plus.setAttribute("aria-label", "Flere " + item.name);
+    plus.addEventListener("click", function () {
+      item.qty += 1;
+      saveState();
+      render();
+    });
+
+    qtyWrap.appendChild(minus);
+    qtyWrap.appendChild(qtyNum);
+    qtyWrap.appendChild(plus);
+
+    var remove = document.createElement("button");
+    remove.className = "sl-item-remove";
+    remove.type = "button";
+    remove.setAttribute("aria-label", "Fjern " + item.name);
+    remove.textContent = "✕";
+    remove.addEventListener("click", function () {
+      items.splice(index, 1);
+      saveState();
+      render();
+    });
+
+    li.appendChild(icon);
+    li.appendChild(name);
+    li.appendChild(qtyWrap);
+    li.appendChild(remove);
+    return li;
+  }
+
   function render() {
     $list.innerHTML = "";
-    items.forEach(function (item, index) {
-      var li = document.createElement("li");
-      li.className = "sl-item";
 
-      var icon = document.createElement("span");
-      icon.className = "sl-item-icon";
-      icon.textContent = item.icon || "";
-
-      var name = document.createElement("span");
-      name.className = "sl-item-name";
-      name.textContent = item.name;
-
-      var qtyWrap = document.createElement("div");
-      qtyWrap.className = "sl-qty";
-
-      var minus = document.createElement("button");
-      minus.className = "sl-qty-btn";
-      minus.type = "button";
-      minus.textContent = "−";
-      minus.setAttribute("aria-label", "Færre " + item.name);
-      minus.addEventListener("click", function () {
-        item.qty -= 1;
-        if (item.qty < 1) items.splice(index, 1);
-        saveState();
-        render();
+    // Grupper varene etter kategori, i butikk-rekkefølge, uten å endre
+    // rekkefølgen i den underliggende listen (den styres av sortByStore).
+    CATEGORY_ORDER.forEach(function (cat) {
+      var indekser = [];
+      items.forEach(function (item, i) {
+        if ((item.category || "annet") === cat) indekser.push(i);
       });
+      if (indekser.length === 0) return;
 
-      var qtyNum = document.createElement("span");
-      qtyNum.className = "sl-qty-num";
-      qtyNum.textContent = item.qty;
+      var header = document.createElement("li");
+      header.className = "sl-group-header";
+      header.textContent = CATEGORY_LABELS[cat] || cat;
+      $list.appendChild(header);
 
-      var plus = document.createElement("button");
-      plus.className = "sl-qty-btn";
-      plus.type = "button";
-      plus.textContent = "+";
-      plus.setAttribute("aria-label", "Flere " + item.name);
-      plus.addEventListener("click", function () {
-        item.qty += 1;
-        saveState();
-        render();
+      indekser.forEach(function (i) {
+        $list.appendChild(buildItemRow(items[i], i));
       });
-
-      qtyWrap.appendChild(minus);
-      qtyWrap.appendChild(qtyNum);
-      qtyWrap.appendChild(plus);
-
-      var remove = document.createElement("button");
-      remove.className = "sl-item-remove";
-      remove.type = "button";
-      remove.setAttribute("aria-label", "Fjern " + item.name);
-      remove.textContent = "✕";
-      remove.addEventListener("click", function () {
-        items.splice(index, 1);
-        saveState();
-        render();
-      });
-
-      li.appendChild(icon);
-      li.appendChild(name);
-      li.appendChild(qtyWrap);
-      li.appendChild(remove);
-      $list.appendChild(li);
     });
 
     $empty.classList.toggle("sl-hidden", items.length > 0);
+    renderTurer();
+  }
+
+  function renderTurer() {
+    if (!$turerSection || !$turerList) return;
+    $turerList.innerHTML = "";
+
+    if (turer.length === 0) {
+      $turerSection.hidden = true;
+      return;
+    }
+    $turerSection.hidden = false;
+
+    turer.forEach(function (tur, turIndex) {
+      var li = document.createElement("li");
+      li.className = "sl-tur";
+
+      var info = document.createElement("div");
+      info.className = "sl-tur-info";
+
+      var dato = document.createElement("div");
+      dato.className = "sl-tur-dato";
+      dato.textContent = tur.dato || "Tidligere tur";
+
+      var vareliste = document.createElement("div");
+      vareliste.className = "sl-tur-varer";
+      vareliste.textContent = tur.items.map(function (i) { return i.name; }).join(", ");
+
+      info.appendChild(dato);
+      info.appendChild(vareliste);
+
+      var hent = document.createElement("button");
+      hent.className = "sl-btn sl-btn-ghost sl-btn-hent";
+      hent.type = "button";
+      hent.textContent = "Hent tilbake";
+      hent.addEventListener("click", function () {
+        hentTilbakeTur(turIndex);
+      });
+
+      li.appendChild(info);
+      li.appendChild(hent);
+      $turerList.appendChild(li);
+    });
+  }
+
+  function hentTilbakeTur(turIndex) {
+    var tur = turer[turIndex];
+    if (!tur) return;
+
+    tur.items.forEach(function (vare) {
+      var eksisterende = items.find(function (i) {
+        return i.name.toLowerCase() === vare.name.toLowerCase();
+      });
+      if (eksisterende) {
+        eksisterende.qty += vare.qty;
+      } else {
+        items.push({ name: vare.name, icon: vare.icon, category: vare.category, qty: vare.qty });
+      }
+    });
+    saveState();
+    render();
+    showToast("Hentet tilbake " + tur.items.length + " varer");
   }
 
   function sortByStore() {
@@ -458,10 +552,26 @@ var ENHET_ID = (function () {
     }
   });
 
+  function datoKlokkeslett() {
+    var now = new Date();
+    var dato = now.toLocaleDateString("no-NO", { day: "2-digit", month: "2-digit", year: "numeric" });
+    var tid = now.toLocaleTimeString("no-NO", { hour: "2-digit", minute: "2-digit" });
+    return dato + " " + tid;
+  }
+
   $clear.addEventListener("click", function () {
     if (items.length === 0) return;
     var confirmed = window.confirm("Tøm hele handlelisten?");
     if (!confirmed) return;
+
+    turer.unshift({
+      dato: datoKlokkeslett(),
+      items: items.map(function (i) {
+        return { name: i.name, icon: i.icon, category: i.category, qty: i.qty };
+      })
+    });
+    turer = turer.slice(0, 5);
+
     items = [];
     saveState();
     render();
@@ -476,6 +586,7 @@ var ENHET_ID = (function () {
   function applyState(state) {
     items = state.items;
     history = state.history;
+    turer = state.turer || [];
     stateLoaded = true;
     render();
   }
