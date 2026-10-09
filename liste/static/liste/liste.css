@@ -308,3 +308,6 @@ h1 { font-size: 1.8rem; margin: 0 0 12px; }
   padding: 14px 4px 6px;
 }
 .sl-group-header:first-child { padding-top: 4px; }
+
+.stat-resultat { margin-top: 10px; }
+.stat-forklaring { font-size: 0.8rem; opacity: 0.65; }
