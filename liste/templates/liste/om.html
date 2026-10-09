@@ -42,6 +42,15 @@
         <p>Siden kjører på en Ubuntu-server hos Oracle Cloud (Always Free-tier). Koden ligger på GitHub, og endringer rulles automatisk ut til serveren når de blir godkjent.</p>
         <p>Når du skanner en strekkode, slås den opp mot Open Food Facts, en åpen og gratis produktdatabase. Oppslag lagres i en liten mellomlagring, så samme vare ikke trenger å slås opp på nytt hver gang.</p>
         <p>Serveren tåler i dag rundt 20–30 personer som bruker appen aktivt samtidig. Hvis flere begynner å bruke den, kan kapasiteten økes ved behov.</p>
+
+        <button id="stat-knapp" class="sl-btn sl-btn-ghost" type="button">Sjekk statistikk</button>
+        <div id="stat-resultat" class="stat-resultat" hidden>
+          <p>Aktive enheter siste 24 timer: <strong id="stat-enheter">–</strong></p>
+          <p>Antall aktive lister: <strong id="stat-aktive">–</strong><br>
+             <span class="stat-forklaring">En liste regnes som aktiv så lenge noen har besøkt den i løpet av de siste 7 dagene.</span></p>
+          <p>Antall arkiverte lister: <strong id="stat-arkiverte">–</strong><br>
+             <span class="stat-forklaring">Lister som ikke er besøkt på 7 dager arkiveres automatisk. Besøkes en arkivert liste på nytt, blir den aktiv igjen. En arkivert liste som ikke besøkes på ytterligere 7 dager (totalt 14 dager inaktiv), slettes permanent.</span></p>
+        </div>
       </div>
     </details>
 
@@ -69,5 +78,30 @@
       </div>
     </details>
   </main>
+  <script>
+    (function () {
+      var btn = document.getElementById("stat-knapp");
+      var resultat = document.getElementById("stat-resultat");
+      if (!btn || !resultat) return;
+
+      btn.addEventListener("click", function () {
+        btn.disabled = true;
+        btn.textContent = "Henter …";
+        fetch("{% url 'statistikk' %}")
+          .then(function (r) { return r.json(); })
+          .then(function (d) {
+            document.getElementById("stat-enheter").textContent = d.aktive_enheter;
+            document.getElementById("stat-aktive").textContent = d.aktive_lister;
+            document.getElementById("stat-arkiverte").textContent = d.arkiverte_lister;
+            resultat.hidden = false;
+            btn.hidden = true;
+          })
+          .catch(function () {
+            btn.disabled = false;
+            btn.textContent = "Kunne ikke hente statistikk, prøv igjen";
+          });
+      });
+    })();
+  </script>
 </body>
 </html>
