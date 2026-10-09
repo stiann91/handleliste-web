@@ -54,7 +54,7 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Nginx terminerer HTTPS foran Django
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-CSRF_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = True
 CSRF_COOKIE_HTTPONLY = False  # JavaScript leser csrftoken-cookien for fetch-kall
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
