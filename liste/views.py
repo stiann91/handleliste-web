@@ -30,6 +30,11 @@ def _aktive_siste_dogn():
     return Besok.objects.filter(sist_sett__gte=timezone.now() - timedelta(hours=24)).count()
 
 
+def _reaktiver(lid):
+    """Setter sist_sett til nå, og fjerner arkivert-merket hvis listen besøkes igjen."""
+    Handleliste.objects.filter(pk=lid).update(sist_sett=timezone.now(), arkivert=False, arkivert_at=None)
+
+
 def _rens_item(i):
     if not isinstance(i, dict):
         raise ValueError("Vare må være et objekt")
@@ -62,7 +67,16 @@ def om(request):
 
 
 def landing(request):
-    return render(request, "liste/landing.html", {"aktive_siste_dogn": _aktive_siste_dogn()})
+    return render(request, "liste/landing.html")
+
+
+@require_GET
+def statistikk(request):
+    return JsonResponse({
+        "aktive_enheter": _aktive_siste_dogn(),
+        "aktive_lister": Handleliste.objects.filter(arkivert=False).count(),
+        "arkiverte_lister": Handleliste.objects.filter(arkivert=True).count(),
+    })
 
 
 @require_POST
@@ -76,9 +90,9 @@ def ny_liste(request):
 def side(request, lid):
     if not Handleliste.objects.filter(pk=lid).exists():
         return render(request, "liste/finnes_ikke.html", status=404)
-    Handleliste.objects.filter(pk=lid).update(sist_sett=timezone.now())
+    _reaktiver(lid)
     _registrer_besok(request)
-    return render(request, "liste/side.html", {"lid": lid, "aktive_siste_dogn": _aktive_siste_dogn()})
+    return render(request, "liste/side.html", {"lid": lid})
 
 
 @require_GET
@@ -86,7 +100,7 @@ def liste_hent(request, lid):
     liste = Handleliste.objects.filter(pk=lid).first()
     if liste is None:
         return JsonResponse({"error": "Finnes ikke"}, status=404)
-    Handleliste.objects.filter(pk=lid).update(sist_sett=timezone.now())
+    _reaktiver(lid)
     _registrer_besok(request)
     return JsonResponse({"items": liste.items, "history": liste.history, "turer": liste.turer})
 
@@ -114,7 +128,8 @@ def liste_lagre(request, lid):
 
     nå = timezone.now()
     Handleliste.objects.filter(pk=lid).update(
-        items=items, history=history, turer=turer, oppdatert=nå, sist_sett=nå
+        items=items, history=history, turer=turer, oppdatert=nå, sist_sett=nå,
+        arkivert=False, arkivert_at=None,
     )
     _registrer_besok(request)
     return JsonResponse({"ok": True})

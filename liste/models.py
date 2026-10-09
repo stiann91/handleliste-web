@@ -13,6 +13,8 @@ class Handleliste(models.Model):
     opprettet = models.DateTimeField(default=timezone.now)
     oppdatert = models.DateTimeField(default=timezone.now)
     sist_sett = models.DateTimeField(default=timezone.now, db_index=True)
+    arkivert = models.BooleanField(default=False, db_index=True)
+    arkivert_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return f"Handleliste {self.id} ({len(self.items)} varer)"
