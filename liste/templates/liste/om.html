@@ -22,8 +22,9 @@
     <details class="om-boks" open>
       <summary>Brukerguide</summary>
       <div class="om-innhold">
+        <p><strong>Del listen:</strong> alle med lenken til listen kan se og endre den. Trykk "Kopier" øverst på siden for å kopiere lenken, Praktisk for en husstand som handler sammen.</p>
         <p><strong>Legg til varer:</strong> skriv varenavnet i feltet øverst og trykk "Legg til", eller trykk Enter. Mens du skriver, foreslår appen varer du har lagt til før.</p>
-        <p><strong>Strekkodeskanning:</strong> trykk "📷 Skann strekkode" og hold kameraet mot strekkoden på varen. Varenavnet fylles inn automatisk hvis varen finnes i produktdatabasen.</p>
+        <p><strong>Strekkodeskanning:</strong> trykk "Skann strekkode" og hold kameraet mot strekkoden på varen. Varenavnet fylles inn automatisk hvis varen finnes i produktdatabasen.</p>
         <p><strong>Gruppering:</strong> varene dine grupperes automatisk etter kategori, som Frukt, Grønnsaker, Meieri og Brød, i den rekkefølgen du vanligvis går gjennom en butikk. Du trenger ikke gjøre noe selv, kategorien settes automatisk basert på varenavnet. Kjenner appen ikke igjen varen, havner den under "Annet".</p>
         <p><strong>Sortering:</strong> innad i hver gruppe sorteres varene alfabetisk, automatisk. Du trenger ikke sortere listen selv.</p>
         <p><strong>Endre antall:</strong> bruk pluss og minus ved siden av hver vare for å justere antall. Går antallet til null, fjernes varen fra listen.</p>
@@ -31,8 +32,9 @@
         <p><strong>Plukket:</strong> når du er i butikken og har lagt en vare i handlekurven, trykk på varen i listen. Den får en grønn bakgrunn og gjennomstreket tekst, og flyttes ned til en egen gruppe kalt "Plukket" nederst i listen. Slik ser du enkelt hva som gjenstår, og hva du allerede har tatt. Trykker du på varen igjen, går den tilbake til sin vanlige gruppe.</p>
         <p><strong>Tøm listen:</strong> trykk "Tøm listen" når du er ferdig å handle. Du blir spurt om bekreftelse, og listen lagres automatisk som en tidligere handletur før den tømmes.</p>
         <p><strong>Tidligere handleturer:</strong> nederst på siden finner du opptil fem tidligere handleturer. Trykk "Hent tilbake" for å legge alle varene fra den turen inn i listen på nytt, praktisk for faste innkjøp.</p>
-        <p><strong>Del listen:</strong> alle med lenken til listen kan se og endre den. Trykk "Kopier" øverst på siden for å kopiere lenken, og del den med dem du handler sammen med, for eksempel over SMS eller en melding-app. Alle som åpner lenken, ser og kan endre den samme listen i sanntid, fra sine egne telefoner eller datamaskiner.</p>
         <p><strong>Ny liste:</strong> vil du starte en helt egen liste, for eksempel til en annen anledning, gå til forsiden og trykk "Ny handleliste". Det gir deg en ny, egen lenke.</p>
+        <p><strong>Om varesorteringen:</strong> Appen kjenner i dag igjen 610 vanlige dagligvarer og sorterer dem i optimal butikkrekkefølge. Ukjente varer legger seg under «Annet» og blir lagt til i databasen ved fremtidige oppdateringer.</p>
+        <p><strong>Ikonene:</strong> idéen kom fra at jeg tidligere brukte ColorNote som handleliste. Der hadde jeg ikoner på varene, slik at sønnen min, som da var 3 år, kunne se hva vi skulle kjøpe, selv om han ikke kunne lese ennå.</p>        
       </div>
     </details>
 
@@ -41,6 +43,7 @@
       <div class="om-innhold">
         <p>Siden kjører på en Ubuntu-server hos Oracle Cloud (Always Free-tier). Koden ligger på GitHub, og endringer rulles automatisk ut til serveren når de blir godkjent.</p>
         <p>Når du skanner en strekkode, slås den opp mot Open Food Facts, en åpen og gratis produktdatabase. Oppslag lagres i en liten mellomlagring, så samme vare ikke trenger å slås opp på nytt hver gang.</p>
+        <p>når du bruker legg til varer med søk så søkes det i lokal database med 610 ulike varer.</p>
         <p>Serveren tåler i dag rundt 20–30 personer som bruker appen aktivt samtidig. Hvis flere begynner å bruke den, kan kapasiteten økes ved behov.</p>
 
         <button id="stat-knapp" class="sl-btn sl-btn-ghost" type="button">Sjekk statistikk</button>
@@ -57,16 +60,7 @@
     <details class="om-boks">
       <summary>Hvorfor det er bygget</summary>
       <div class="om-innhold">
-        <p>Jeg trengte en enkel, delt handleliste som kona og jeg kunne bruke sammen, uten å måtte installere en egen app eller opprette brukerkontoer.</p>
-      </div>
-    </details>
-
-    <details class="om-boks">
-      <summary>Funksjonene</summary>
-      <div class="om-innhold">
-        <p><strong>Ikonene:</strong> idéen kom fra at jeg tidligere brukte ColorNote som handleliste. Der hadde jeg ikoner på varene, slik at sønnen min, som da var 3 år, kunne se hva vi skulle kjøpe, selv om han ikke kunne lese ennå.</p>
-        <p><strong>Strekkodeskanning:</strong> hold kameraet mot strekkoden, så fylles varenavnet inn automatisk.</p>
-        <p><strong>Del lenke:</strong> alle med lenken kan se og endre listen. Praktisk for en husstand som handler sammen.</p>
+        <p>Jeg trengte en enkel, delt handleliste som kona og jeg kunne bruke sammen, uten å måtte betale, installere en egen app eller opprette brukerkontoer for begge to.</p>
       </div>
     </details>
 
