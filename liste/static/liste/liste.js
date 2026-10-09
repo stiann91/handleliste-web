@@ -51,6 +51,7 @@ var ENHET_ID = (function () {
     "banan": ["🍌", "frukt"], "bananer": ["🍌", "frukt"],
     "appelsin": ["🍊", "frukt"], "sitron": ["🍋", "frukt"],
     "druer": ["🍇", "frukt"], "jordbær": ["🍓", "frukt"],
+    "pære": ["🍐", "frukt"], "pærer": ["🍐", "frukt"],
     "avokado": ["🥑", "frukt"], "ananas": ["🍍", "frukt"],
 
     "poteter": ["🥔", "grønnsaker"], "potet": ["🥔", "grønnsaker"],
@@ -59,6 +60,8 @@ var ENHET_ID = (function () {
     "tomat": ["🍅", "grønnsaker"], "agurk": ["🥒", "grønnsaker"],
     "salat": ["🥬", "grønnsaker"], "brokkoli": ["🥦", "grønnsaker"],
     "paprika": ["🫑", "grønnsaker"], "mais": ["🌽", "grønnsaker"],
+    "blomkål": ["🥦", "grønnsaker"], "ruccola": ["🥬", "grønnsaker"],
+    "rucola": ["🥬", "grønnsaker"], "spinat": ["🥬", "grønnsaker"],
 
     "brød": ["🍞", "brød"], "rundstykke": ["🥐", "brød"], "knekkebrød": ["🍞", "brød"],
 
