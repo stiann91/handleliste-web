@@ -70,6 +70,15 @@
   <script src="{% static 'liste/liste.js' %}"></script>
   <script>
     (function () {
+      try {
+        localStorage.setItem("handleliste_id", "{{ lid }}");
+      } catch (e) {
+        // localStorage utilgjengelig (f.eks. privat nettlesing) – ikke kritisk
+      }
+    })();
+  </script>
+  <script>
+    (function () {
       var btn = document.getElementById("sl-copy-link");
       var text = document.getElementById("sl-link-text");
       if (!btn || !text) return;

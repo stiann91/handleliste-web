@@ -13,6 +13,20 @@
   <link rel="apple-touch-icon" href="{% static 'liste/icons/apple-touch-icon.png' %}">
   <link rel="manifest" href="{% static 'liste/icons/site.webmanifest' %}">
   <meta name="theme-color" content="#6b4a35">
+  <script>
+    // Kjøres så tidlig som mulig for å unngå "blink" av landing-innholdet
+    // for brukere som allerede har en liste.
+    (function () {
+      try {
+        var lagretId = localStorage.getItem("handleliste_id");
+        if (lagretId) {
+          window.location.replace("/liste/" + lagretId + "/");
+        }
+      } catch (e) {
+        // localStorage utilgjengelig – vis vanlig landing-side
+      }
+    })();
+  </script>
 </head>
 <body>
   <main class="wrap">

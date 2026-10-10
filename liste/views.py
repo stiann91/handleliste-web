@@ -89,7 +89,7 @@ def ny_liste(request):
 @require_GET
 def side(request, lid):
     if not Handleliste.objects.filter(pk=lid).exists():
-        return render(request, "liste/finnes_ikke.html", status=404)
+        return render(request, "liste/finnes_ikke.html", {"lid": lid}, status=404)
     _reaktiver(lid)
     _registrer_besok(request)
     return render(request, "liste/side.html", {"lid": lid})

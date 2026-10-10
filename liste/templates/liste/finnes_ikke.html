@@ -13,6 +13,17 @@
   <link rel="apple-touch-icon" href="{% static 'liste/icons/apple-touch-icon.png' %}">
   <link rel="manifest" href="{% static 'liste/icons/site.webmanifest' %}">
   <meta name="theme-color" content="#6b4a35">
+  <script>
+    (function () {
+      try {
+        if (localStorage.getItem("handleliste_id") === "{{ lid }}") {
+          localStorage.removeItem("handleliste_id");
+        }
+      } catch (e) {
+        // localStorage utilgjengelig
+      }
+    })();
+  </script>
 </head>
 <body>
   <main class="wrap">
