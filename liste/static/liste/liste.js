@@ -791,13 +791,50 @@ var ITEM_DB = {
     return linje.replace(/^\s*(?:[-•*]+|\d+[.)])\s*/, "").trim();
   }
 
-  // Splitter limt inn tekst på linjeskift, komma og semikolon,
-  // renser bort kulepunkt/tall-prefiks, og filtrerer bort tomme resultater.
+  // Kjenner igjen en linje som BARE er en mengde, f.eks. "3,5 dl", "100 g",
+  // "1 stk" eller "1/2 ts" – typisk når man limer inn en oppskrift der
+  // mengde og varenavn står på hver sin linje.
+  var MENGDE_REGEX = /^(\d+\/\d+|\d+(?:[.,]\d+)?)\s*(ss|ts|dl|cl|ml|l|kg|g|mg|stk|boks|bokser|pose|poser|fedd|skive|skiver|klype|knivsodd|pk)\.?$/i;
+
+  function erMengdeLinje(linje) {
+    return MENGDE_REGEX.test(linje.trim());
+  }
+
+  // Splitter limt inn tekst på linjeskift. Hvis en linje bare er en mengde
+  // (og neste linje ikke også er det), slås den sammen med varenavnet på
+  // neste linje som tilleggsinfo i parentes – f.eks. "3,5 dl" + "hvetemel"
+  // blir til "hvetemel (3,5 dl)". Linjer som ikke slås sammen kan fortsatt
+  // inneholde flere varer skilt med komma/semikolon, som før.
+  //
+  // Sammenslåtte linjer splittes IKKE videre på komma, slik at et desimaltall
+  // skrevet med komma (f.eks. "3,5 dl") ikke kuttes feil i to.
   function parseFlereVarer(tekst) {
-    return (tekst || "")
-      .split(/[\n,;]+/)
-      .map(rensVarelinje)
+    var linjer = (tekst || "")
+      .split(/\n+/)
+      .map(function (s) { return s.trim(); })
       .filter(function (s) { return s.length > 0; });
+
+    var resultat = [];
+    var i = 0;
+    while (i < linjer.length) {
+      var linje = linjer[i];
+      var neste = linjer[i + 1];
+
+      if (erMengdeLinje(linje) && neste && !erMengdeLinje(neste)) {
+        var navn = rensVarelinje(neste);
+        if (navn) resultat.push(navn + " (" + linje + ")");
+        i += 2;
+        continue;
+      }
+
+      linje.split(/[,;]+/).forEach(function (del) {
+        var ren = rensVarelinje(del);
+        if (ren) resultat.push(ren);
+      });
+      i += 1;
+    }
+
+    return resultat;
   }
 
   function addMultipleItems(rawText) {
