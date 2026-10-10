@@ -1,0 +1,90 @@
+{% load static %}
+<details class="om-boks">
+  <summary>Brukerguide</summary>
+  <div class="om-innhold">
+    <p><strong>Del listen:</strong> alle med lenken til listen kan se og endre den. Trykk "Kopier" øverst på siden for å kopiere lenken, Praktisk for en husstand som handler sammen.</p>
+    <p><strong>Legg til varer:</strong> skriv varenavnet i feltet øverst og trykk "Legg til", eller trykk Enter. Mens du skriver, foreslår appen varer du har lagt til før.</p>
+    <p><strong>Om varesorteringen:</strong> Appen kjenner i dag igjen 610 vanlige dagligvarer og sorterer dem i optimal butikkrekkefølge. Ukjente varer legger seg under «Annet» og blir lagt til i databasen ved fremtidige oppdateringer.</p>
+    <p><strong>Ikonene:</strong> idéen kom fra at jeg tidligere brukte ColorNote som handleliste. Der hadde jeg ikoner på varene, slik at sønnen min, som da var 3 år, kunne se hva vi skulle kjøpe, selv om han ikke kunne lese ennå.</p>
+    <p><strong>Strekkodeskanning:</strong> trykk "Skann strekkode" og hold kameraet mot strekkoden på varen. Varenavnet fylles inn automatisk hvis varen finnes i produktdatabasen.</p>
+    <p><strong>Gruppering:</strong> varene dine grupperes automatisk etter kategori, som Frukt, Grønnsaker, Meieri og Brød, i den rekkefølgen du vanligvis går gjennom en butikk. Du trenger ikke gjøre noe selv, kategorien settes automatisk basert på varenavnet. Kjenner appen ikke igjen varen, havner den under "Annet".</p>
+    <p><strong>Sortering:</strong> innad i hver gruppe sorteres varene alfabetisk, automatisk. Du trenger ikke sortere listen selv.</p>
+    <img src="{% static 'liste/img/2.png' %}" alt="side" width="100%" height="auto">
+
+    <p><strong>Endre antall:</strong> bruk pluss og minus ved siden av hver vare for å justere antall. Går antallet til null, fjernes varen fra listen.</p>
+    <p><strong>Fjern en vare:</strong> trykk på ✕ ved siden av varen for å fjerne den helt, uansett antall.</p>
+    <p><strong>Plukket:</strong> når du er i butikken og har lagt en vare i handlekurven, trykk på varen i listen. Den får en grønn bakgrunn og gjennomstreket tekst, og flyttes ned til en egen gruppe kalt "Plukket" nederst i listen. Slik ser du enkelt hva som gjenstår, og hva du allerede har tatt. Trykker du på varen igjen, går den tilbake til sin vanlige gruppe.</p>
+    <p><strong>Tøm listen:</strong> trykk "Tøm listen" når du er ferdig å handle. Du blir spurt om bekreftelse, og listen lagres automatisk som en tidligere handletur før den tømmes.</p>
+    <img src="{% static 'liste/img/4.png' %}" alt="side" width="100%" height="auto">
+
+    <p><strong>Tidligere handleturer:</strong> nederst på siden finner du opptil fem tidligere handleturer. Trykk "Hent tilbake" for å legge alle varene fra den turen inn i listen på nytt, praktisk for faste innkjøp.</p>
+    <img src="{% static 'liste/img/3.png' %}" alt="side" width="100%" height="auto">
+
+    <p><strong>Ny liste:</strong> vil du starte en helt egen liste, for eksempel til en annen anledning, gå til forsiden og trykk "Ny handleliste". Det gir deg en ny, egen lenke.</p>
+    {% if vis_tilbake_lenke %}
+    <p class="del-label"><a href="/" class="btn-copy-link">← Tilbake til forsiden</a></p>
+    {% endif %}
+    <img src="{% static 'liste/img/1.png' %}" alt="side" width="100%" height="auto">
+
+  </div>
+</details>
+
+<details class="om-boks">
+  <summary>Hvordan det er bygget</summary>
+  <div class="om-innhold">
+    <p>Siden kjører på en Ubuntu-server hos Oracle Cloud (Always Free-tier). Koden ligger på GitHub, og endringer rulles automatisk ut til serveren når de blir godkjent.</p>
+    <p>Når du skanner en strekkode, slås den opp mot Open Food Facts, en åpen og gratis produktdatabase. Oppslag lagres i en liten mellomlagring, så samme vare ikke trenger å slås opp på nytt hver gang.</p>
+    <p>når du bruker legg til varer med søk så søkes det i lokal database med 610 ulike varer.</p>
+    <p>Serveren tåler i dag rundt 20–30 personer som bruker appen aktivt samtidig. Hvis flere begynner å bruke den, kan kapasiteten økes ved behov.</p>
+
+    <button id="stat-knapp" class="sl-btn sl-btn-ghost" type="button">Sjekk statistikk</button>
+    <div id="stat-resultat" class="stat-resultat" hidden>
+      <p>Aktive enheter siste 24 timer: <strong id="stat-enheter">–</strong></p>
+      <p>Antall aktive lister: <strong id="stat-aktive">–</strong><br>
+         <span class="stat-forklaring">En liste regnes som aktiv så lenge noen har besøkt den i løpet av de siste 7 dagene.</span></p>
+      <p>Antall arkiverte lister: <strong id="stat-arkiverte">–</strong><br>
+         <span class="stat-forklaring">Lister som ikke er besøkt på 7 dager arkiveres automatisk. Besøkes en arkivert liste på nytt, blir den aktiv igjen. En arkivert liste som ikke besøkes på ytterligere 7 dager (totalt 14 dager inaktiv), slettes permanent.</span></p>
+    </div>
+  </div>
+</details>
+
+<details class="om-boks">
+  <summary>Hvorfor det er bygget</summary>
+  <div class="om-innhold">
+    <p>Jeg trengte en enkel, delt handleliste som kona og jeg kunne bruke sammen, uten å måtte betale, installere en egen app eller opprette brukerkontoer for begge to.</p>
+  </div>
+</details>
+
+<details class="om-boks">
+  <summary>Tips til forbedringer</summary>
+  <div class="om-innhold">
+    <p>Har du forslag eller finner noe som ikke fungerer? Send meg gjerne en e-post:</p>
+    <p><a href="mailto:stiann91@gmail.com" class="btn-copy-link">stiann91@gmail.com</a></p>
+  </div>
+</details>
+
+<script>
+  (function () {
+    var btn = document.getElementById("stat-knapp");
+    var resultat = document.getElementById("stat-resultat");
+    if (!btn || !resultat) return;
+
+    btn.addEventListener("click", function () {
+      btn.disabled = true;
+      btn.textContent = "Henter …";
+      fetch("{% url 'statistikk' %}")
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          document.getElementById("stat-enheter").textContent = d.aktive_enheter;
+          document.getElementById("stat-aktive").textContent = d.aktive_lister;
+          document.getElementById("stat-arkiverte").textContent = d.arkiverte_lister;
+          resultat.hidden = false;
+          btn.hidden = true;
+        })
+        .catch(function () {
+          btn.disabled = false;
+          btn.textContent = "Kunne ikke hente statistikk, prøv igjen";
+        });
+    });
+  })();
+</script>

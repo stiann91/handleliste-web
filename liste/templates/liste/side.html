@@ -13,12 +13,45 @@
   <link rel="apple-touch-icon" href="{% static 'liste/icons/apple-touch-icon.png' %}">
   <link rel="manifest" href="{% static 'liste/icons/site.webmanifest' %}">
   <meta name="theme-color" content="#6b4a35">
+  <style>
+    .about-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      overflow-y: auto;
+      padding: 24px 16px;
+    }
+    .about-modal[hidden] {
+      display: none;
+    }
+    .about-modal-content {
+      background: #fff;
+      max-width: 500px;
+      width: 100%;
+      margin: 24px auto;
+      padding: 24px;
+      border-radius: 12px;
+      position: relative;
+    }
+    .about-modal-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: none;
+      border: none;
+      font-size: 1.4rem;
+      line-height: 1;
+      cursor: pointer;
+      padding: 6px 10px;
+    }
+  </style>
 </head>
 <body>
   <main class="wrap">
     <div class="page-header">
       <h1>🛒 Handleliste</h1>
-      <a href="{% url 'om' %}" class="info-btn">ℹ️ Om siden</a>
+      <button type="button" id="open-about-btn" class="info-btn" style="background:none; border:none; cursor:pointer; font:inherit;">ℹ️ Om siden</button>
     </div>
 
     <div class="del-card">
@@ -66,6 +99,15 @@
             <div id="sl-toast" class="sl-toast" role="status" aria-live="polite"></div>
           </div>
   </main>
+
+  <div id="about-modal" class="about-modal" hidden>
+    <div class="about-modal-content" role="dialog" aria-modal="true" aria-labelledby="about-modal-title">
+      <button type="button" id="close-about-btn" class="about-modal-close" aria-label="Lukk">✕</button>
+      <h2 id="about-modal-title">ℹ️ Om siden</h2>
+      {% include "liste/_om_innhold.html" with vis_tilbake_lenke=False %}
+    </div>
+  </div>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
   <script src="{% static 'liste/liste.js' %}"></script>
   <script>
@@ -115,6 +157,35 @@
         } else {
           reserveKopiering(verdi);
         }
+      });
+    })();
+  </script>
+  <script>
+    (function () {
+      var openBtn = document.getElementById("open-about-btn");
+      var closeBtn = document.getElementById("close-about-btn");
+      var modal = document.getElementById("about-modal");
+      if (!openBtn || !modal) return;
+
+      function apneModal() {
+        modal.hidden = false;
+        document.body.style.overflow = "hidden";
+      }
+
+      function lukkModal() {
+        modal.hidden = true;
+        document.body.style.overflow = "";
+      }
+
+      openBtn.addEventListener("click", apneModal);
+      if (closeBtn) closeBtn.addEventListener("click", lukkModal);
+
+      modal.addEventListener("click", function (e) {
+        if (e.target === modal) lukkModal();
+      });
+
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && !modal.hidden) lukkModal();
       });
     })();
   </script>
