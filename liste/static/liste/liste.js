@@ -914,6 +914,7 @@ var ITEM_DB = {
   var SKANN_COOLDOWN_MS = 2500;
 
   function visSkannFeedback() {
+    if (navigator.vibrate) navigator.vibrate(80);
     $scanFeedback.hidden = false;
     $scanFeedback.classList.add("sl-scan-feedback-vis");
     window.clearTimeout(visSkannFeedback._t);
@@ -974,12 +975,14 @@ var ITEM_DB = {
     scanner.start(
       { facingMode: "environment" },
       {
-        fps: 15,
-        qrbox: { width: 300, height: 150 },
+        fps: 12,
+        qrbox: { width: 260, height: 120 },
+        disableFlip: true,
         videoConstraints: {
           facingMode: "environment",
-          width: { ideal: 1920 },
-          height: { ideal: 1080 }
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+          advanced: [{ focusMode: "continuous" }]
         },
         experimentalFeatures: { useBarCodeDetectorIfSupported: true },
       },
