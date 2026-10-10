@@ -77,6 +77,44 @@
       margin-bottom: 8px;
       width: 100%;
     }
+    .sl-scanner-wrap {
+      position: relative;
+      max-width: 360px;
+    }
+    .sl-scan-feedback {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(34, 139, 34, 0.6);
+      color: #fff;
+      font-size: 1.3rem;
+      font-weight: 600;
+      text-align: center;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s ease;
+      z-index: 1;
+    }
+    .sl-scan-feedback.sl-scan-feedback-vis {
+      opacity: 1;
+    }
+    .sl-scan-close-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(0, 0, 0, 0.6);
+      color: #fff;
+      font-size: 1.1rem;
+      line-height: 1;
+      cursor: pointer;
+      z-index: 2;
+    }
   </style>
 </head>
 <body>
@@ -120,7 +158,11 @@
             <div class="sl-divider"><span>eller</span></div>
             <button id="sl-scan" class="sl-btn sl-btn-scan" type="button">║▌│█║ Skann strekkode</button>
 
-            <div id="sl-scanner" style="max-width:360px;" hidden></div>
+            <div id="sl-scanner-wrap" class="sl-scanner-wrap" hidden>
+              <div id="sl-scanner"></div>
+              <div id="sl-scan-feedback" class="sl-scan-feedback" hidden>✓ Lagt til</div>
+              <button id="sl-scan-close" class="sl-scan-close-btn" type="button" aria-label="Lukk skanner">✕</button>
+            </div>
 
             <ul id="sl-list" class="sl-list"></ul>
 

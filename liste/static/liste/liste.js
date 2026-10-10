@@ -901,7 +901,27 @@ var ITEM_DB = {
   // ── Strekkodeskanning ──
   var scanner = null;
   var $scanBtn = document.getElementById("sl-scan");
-  var $scanBox = document.getElementById("sl-scanner");
+  var $scanBox = document.getElementById("sl-scanner-wrap");
+  var $scanFeedback = document.getElementById("sl-scan-feedback");
+  var $scanCloseBtn = document.getElementById("sl-scan-close");
+  var SKANN_TEKST_START = "║▌│█║ Skann strekkode";
+  var SKANN_TEKST_LUKK = "✕ Lukk skanner";
+
+  // Unngår at samme strekkode legges til flere ganger mens kameraet
+  // fortsatt peker på den (multiskanning holder kameraet åpent).
+  var sisteSkannetKode = null;
+  var sisteSkannetTid = 0;
+  var SKANN_COOLDOWN_MS = 2500;
+
+  function visSkannFeedback() {
+    $scanFeedback.hidden = false;
+    $scanFeedback.classList.add("sl-scan-feedback-vis");
+    window.clearTimeout(visSkannFeedback._t);
+    visSkannFeedback._t = window.setTimeout(function () {
+      $scanFeedback.classList.remove("sl-scan-feedback-vis");
+      window.setTimeout(function () { $scanFeedback.hidden = true; }, 200);
+    }, 900);
+  }
 
   function rensNavn(navn) {
     return navn.replace(/\s+\d+([.,]\d+)?\s?(g|kg|ml|cl|l|stk)\b.*$/i, "").trim();
@@ -928,10 +948,18 @@ var ITEM_DB = {
   }
 
   function stopScan() {
-    if (!scanner) return Promise.resolve();
+    $scanFeedback.hidden = true;
+    $scanFeedback.classList.remove("sl-scan-feedback-vis");
+    sisteSkannetKode = null;
+    if (!scanner) {
+      $scanBox.hidden = true;
+      $scanBtn.textContent = SKANN_TEKST_START;
+      return Promise.resolve();
+    }
     var s = scanner;
     scanner = null;
     $scanBox.hidden = true;
+    $scanBtn.textContent = SKANN_TEKST_START;
     return s.stop().then(function () { s.clear(); }).catch(function () {});
   }
 
@@ -941,6 +969,7 @@ var ITEM_DB = {
       return;
     }
     $scanBox.hidden = false;
+    $scanBtn.textContent = SKANN_TEKST_LUKK;
     scanner = new Html5Qrcode("sl-scanner");
     scanner.start(
       { facingMode: "environment" },
@@ -955,17 +984,31 @@ var ITEM_DB = {
         experimentalFeatures: { useBarCodeDetectorIfSupported: true },
       },
       function (kode) {
-        stopScan().then(function () { lookupBarcode(kode); });
+        // Multiskanning: kameraet holder seg åpent etter et treff.
+        // Samme kode ignoreres en liten stund, slik at man ikke legger
+        // til samme vare flere ganger mens kameraet fortsatt peker på den.
+        var nå = Date.now();
+        if (kode === sisteSkannetKode && nå - sisteSkannetTid < SKANN_COOLDOWN_MS) return;
+        sisteSkannetKode = kode;
+        sisteSkannetTid = nå;
+
+        visSkannFeedback();
+        lookupBarcode(kode);
       }
     ).catch(function () {
       scanner = null;
       $scanBox.hidden = true;
+      $scanBtn.textContent = SKANN_TEKST_START;
       showToast("Fant ikke kamera (krever HTTPS)");
     });
   }
 
   $scanBtn.addEventListener("click", function () {
     if (scanner) stopScan(); else startScan();
+  });
+
+  $scanCloseBtn.addEventListener("click", function () {
+    stopScan();
   });
 
   // Slå av kameraet når fanen skjules
