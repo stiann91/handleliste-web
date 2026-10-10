@@ -29,7 +29,10 @@
   <main class="wrap">
     <h1>Listen finnes ikke</h1>
     <p>Lenken kan være feil, eller listen er slettet etter 7 dager uten bruk.</p>
-    <p><a class="knapp-lenke" href="/">Lag en ny liste</a></p>
+    <form method="post" action="{% url 'ny' %}">
+      {% csrf_token %}
+      <button class="knapp" type="submit">Lag en ny liste</button>
+    </form>
   </main>
 </body>
 </html>
