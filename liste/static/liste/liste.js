@@ -559,7 +559,10 @@ var ITEM_DB = {
   var stateLoaded = false;
 
   var $input = document.getElementById("sl-input");
+  var $inputMulti = document.getElementById("sl-input-multi");
+  var $multiToggle = document.getElementById("sl-multi-toggle");
   var $add = document.getElementById("sl-add");
+  var flerModus = false;
   var $list = document.getElementById("sl-list");
   var $empty = document.getElementById("sl-empty");
   var $suggestions = document.getElementById("sl-suggestions");
@@ -753,10 +756,10 @@ var ITEM_DB = {
     showToast("Hentet tilbake " + tur.items.length + " varer");
   }
 
-  function addItem(rawName) {
-    var name = (rawName || "").trim();
-    if (!name) return;
-
+  // Selve "legg til én vare"-logikken, uten lagring/rendring.
+  // Brukes både for enkeltvarer og for hver vare i en bulk-innlegging,
+  // slik at vi bare lagrer og rendrer én gang uansett hvor mange varer som legges til.
+  function leggTilEnVare(name) {
     var existing = items.find(function (i) { return i.name.toLowerCase() === name.toLowerCase(); });
     if (existing) {
       existing.qty += 1;
@@ -767,13 +770,48 @@ var ITEM_DB = {
 
     var known = history.some(function (h) { return h.toLowerCase() === name.toLowerCase(); });
     if (!known) history.push(name);
+  }
 
+  function addItem(rawName) {
+    var name = (rawName || "").trim();
+    if (!name) return;
+
+    leggTilEnVare(name);
     saveState();
 
     $input.value = "";
     hideSuggestions();
     render();
     $input.focus();
+  }
+
+  // Fjerner kulepunkt/tall-prefiks fra starten av en linje, f.eks.
+  // "- Melk", "• Brød", "1. Egg" eller "2) Smør" blir til "Melk", "Brød", "Egg", "Smør".
+  function rensVarelinje(linje) {
+    return linje.replace(/^\s*(?:[-•*]+|\d+[.)])\s*/, "").trim();
+  }
+
+  // Splitter limt inn tekst på linjeskift, komma og semikolon,
+  // renser bort kulepunkt/tall-prefiks, og filtrerer bort tomme resultater.
+  function parseFlereVarer(tekst) {
+    return (tekst || "")
+      .split(/[\n,;]+/)
+      .map(rensVarelinje)
+      .filter(function (s) { return s.length > 0; });
+  }
+
+  function addMultipleItems(rawText) {
+    var navn = parseFlereVarer(rawText);
+    if (navn.length === 0) return;
+
+    navn.forEach(leggTilEnVare);
+    saveState();
+
+    $inputMulti.value = "";
+    hideSuggestions();
+    render();
+
+    showToast(navn.length === 1 ? "La til 1 vare" : "La til " + navn.length + " varer");
   }
 
   function showSuggestions(query) {
@@ -898,7 +936,38 @@ var ITEM_DB = {
     if (document.hidden) stopScan();
   });
 
-  $add.addEventListener("click", function () { addItem($input.value); });
+  $add.addEventListener("click", function () {
+    if (flerModus) {
+      addMultipleItems($inputMulti.value);
+    } else {
+      addItem($input.value);
+    }
+  });
+
+  if ($multiToggle && $inputMulti) {
+    $multiToggle.addEventListener("click", function () {
+      flerModus = !flerModus;
+      hideSuggestions();
+
+      if (flerModus) {
+        $input.hidden = true;
+        $input.value = "";
+        $inputMulti.hidden = false;
+        $inputMulti.value = "";
+        $inputMulti.focus();
+        $add.textContent = "Legg til alle";
+        $multiToggle.textContent = "✎ Én vare om gangen";
+      } else {
+        $inputMulti.hidden = true;
+        $inputMulti.value = "";
+        $input.hidden = false;
+        $input.value = "";
+        $add.textContent = "Legg til";
+        $multiToggle.textContent = "📋 Lim inn flere varer";
+        $input.focus();
+      }
+    });
+  }
 
   $input.addEventListener("input", function () { showSuggestions($input.value); });
 

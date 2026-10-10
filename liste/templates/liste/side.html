@@ -65,6 +65,18 @@
     .about-modal-content a {
       color: #6b4a35;
     }
+    .sl-input-multi {
+      width: 100%;
+      min-height: 100px;
+      resize: vertical;
+      font: inherit;
+      box-sizing: border-box;
+    }
+    .sl-multi-toggle-btn {
+      margin-top: 8px;
+      margin-bottom: 8px;
+      width: 100%;
+    }
   </style>
 </head>
 <body>
@@ -92,10 +104,18 @@
                   placeholder="Legg til vare …"
                   autocomplete="off"
                 />
+                <textarea
+                  id="sl-input-multi"
+                  class="sl-input sl-input-multi"
+                  placeholder="Lim inn flere varer, én per linje eller skilt med komma …"
+                  rows="4"
+                  hidden
+                ></textarea>
                 <ul id="sl-suggestions" class="sl-suggestions" hidden></ul>
               </div>
               <button id="sl-add" class="sl-btn sl-btn-add" type="button">Legg til</button>
             </div>
+            <button id="sl-multi-toggle" class="sl-btn sl-btn-ghost sl-multi-toggle-btn" type="button">📋 Lim inn flere varer</button>
 
             <div class="sl-divider"><span>eller</span></div>
             <button id="sl-scan" class="sl-btn sl-btn-scan" type="button">║▌│█║ Skann strekkode</button>
