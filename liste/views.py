@@ -1,5 +1,5 @@
 import json
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
@@ -62,6 +62,26 @@ def _rens_tur(t):
     }
 
 
+def _rens_dato(verdi):
+    """Tar imot 'yyyy-mm-dd' (slik <input type=date> sender det) og returnerer en date,
+    eller None hvis verdien mangler/er ugyldig."""
+    if not isinstance(verdi, str) or not verdi:
+        return None
+    try:
+        return datetime.strptime(verdi, "%Y-%m-%d").date()
+    except ValueError:
+        return None
+
+
+def _og_tittel(liste):
+    """Teksten som vises som tittel når lenken deles, f.eks. i Facebook/iMessage."""
+    dato = liste.dato or liste.opprettet.date()
+    dato_str = dato.strftime("%d/%m/%Y")
+    if liste.tittel:
+        return f"Handleliste for {liste.tittel} ({dato_str})"
+    return f"Handleliste ({dato_str})"
+
+
 def om(request):
     return render(request, "liste/om.html")
 
@@ -81,8 +101,7 @@ def statistikk(request):
 
 @require_POST
 def ny_liste(request):
-    standard_tittel = "HandlelisteNavn - " + timezone.now().strftime("%d/%m/%Y")
-    liste = Handleliste.objects.create(tittel=standard_tittel)
+    liste = Handleliste.objects.create(dato=timezone.now().date())
     return redirect("side", lid=liste.id)
 
 
@@ -94,7 +113,13 @@ def side(request, lid):
         return render(request, "liste/finnes_ikke.html", {"lid": lid}, status=404)
     _reaktiver(lid)
     _registrer_besok(request)
-    return render(request, "liste/side.html", {"lid": lid, "tittel": liste.tittel})
+    dato = liste.dato or liste.opprettet.date()
+    return render(request, "liste/side.html", {
+        "lid": lid,
+        "tittel": liste.tittel,
+        "dato_iso": dato.isoformat(),
+        "og_tittel": _og_tittel(liste),
+    })
 
 
 @require_GET
@@ -104,8 +129,10 @@ def liste_hent(request, lid):
         return JsonResponse({"error": "Finnes ikke"}, status=404)
     _reaktiver(lid)
     _registrer_besok(request)
+    dato = liste.dato or liste.opprettet.date()
     return JsonResponse({
-        "items": liste.items, "history": liste.history, "turer": liste.turer, "tittel": liste.tittel,
+        "items": liste.items, "history": liste.history, "turer": liste.turer,
+        "tittel": liste.tittel, "dato": dato.isoformat(),
     })
 
 
@@ -119,6 +146,7 @@ def liste_lagre(request, lid):
         history = payload.get("history")
         turer = payload.get("turer", [])
         tittel = payload.get("tittel", "")
+        dato = _rens_dato(payload.get("dato"))
         if not isinstance(items, list) or not isinstance(history, list):
             raise ValueError("items og history må være lister")
         if not isinstance(turer, list) or len(turer) > MAKS_TURER:
@@ -134,7 +162,7 @@ def liste_lagre(request, lid):
 
     nå = timezone.now()
     Handleliste.objects.filter(pk=lid).update(
-        items=items, history=history, turer=turer, tittel=tittel, oppdatert=nå, sist_sett=nå,
+        items=items, history=history, turer=turer, tittel=tittel, dato=dato, oppdatert=nå, sist_sett=nå,
         arkivert=False, arkivert_at=None,
     )
     _registrer_besok(request)

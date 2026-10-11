@@ -530,7 +530,8 @@ var ITEM_DB = {
           items: loadedItems,
           history: Array.isArray(data.history) ? data.history : [],
           turer: loadedTurer,
-          tittel: typeof data.tittel === "string" ? data.tittel : ""
+          tittel: typeof data.tittel === "string" ? data.tittel : "",
+          dato: typeof data.dato === "string" ? data.dato : ""
         };
       })
   }
@@ -548,7 +549,7 @@ var ITEM_DB = {
         "X-CSRFToken": getCookie("csrftoken"),
         "X-Enhet-ID": ENHET_ID
       },
-      body: JSON.stringify({ items: items, history: history, turer: turer, tittel: tittel })
+      body: JSON.stringify({ items: items, history: history, turer: turer, tittel: tittel, dato: dato })
     }).catch(function () {
       showToast("Kunne ikke lagre til serveren");
     });
@@ -560,8 +561,10 @@ var ITEM_DB = {
   var stateLoaded = false;
 
   var $tittelInput = document.getElementById("sl-tittel");
-  // Startverdien kommer fra serveren (unngår "blink" før fetchState svarer).
+  var $datoInput = document.getElementById("sl-dato");
+  // Startverdiene kommer fra serveren (unngår "blink" før fetchState svarer).
   var tittel = $tittelInput ? $tittelInput.value : "";
+  var dato = $datoInput ? $datoInput.value : "";
 
   var $input = document.getElementById("sl-input");
   var $inputMulti = document.getElementById("sl-input-multi");
@@ -1156,10 +1159,14 @@ var ITEM_DB = {
     items = state.items;
     history = state.history;
     turer = state.turer || [];
-    // Ikke overskriv mens brukeren faktisk står og skriver i feltet.
+    // Ikke overskriv mens brukeren faktisk står og skriver/velger i feltet.
     if (document.activeElement !== $tittelInput) {
       tittel = state.tittel || "";
       if ($tittelInput) $tittelInput.value = tittel;
+    }
+    if (document.activeElement !== $datoInput) {
+      dato = state.dato || "";
+      if ($datoInput) $datoInput.value = dato;
     }
     document.title = (tittel || "Handleliste") + " – Handleliste";
     stateLoaded = true;
@@ -1180,6 +1187,15 @@ var ITEM_DB = {
       if (e.key === "Enter") {
         e.preventDefault();
         $tittelInput.blur();
+      }
+    });
+  }
+
+  if ($datoInput) {
+    $datoInput.addEventListener("change", function () {
+      if ($datoInput.value !== dato) {
+        dato = $datoInput.value;
+        saveState();
       }
     });
   }

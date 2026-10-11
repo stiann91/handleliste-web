@@ -33,10 +33,16 @@ h1 { font-size: 1.8rem; margin: 0 0 12px; }
 }
 .info-btn:hover { background: rgba(255,255,255,0.14); }
 
-.tittel-rad { max-width: 480px; margin: 0 0 12px; }
-.sl-tittel-input {
-  width: 100%;
-  font-size: 1.15rem;
+.tittel-rad {
+  max-width: 480px;
+  margin: 0 0 12px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.sl-tittel-input,
+.sl-dato-input {
+  font-size: 1rem;
   font-weight: 600;
   background: transparent;
   color: #f0eee9;
@@ -46,9 +52,13 @@ h1 { font-size: 1.8rem; margin: 0 0 12px; }
   font-family: inherit;
   box-sizing: border-box;
 }
+.sl-tittel-input { flex: 1; min-width: 160px; }
+.sl-dato-input { flex: 0 0 auto; color-scheme: dark; }
 .sl-tittel-input::placeholder { color: rgba(240,238,233,0.5); }
-.sl-tittel-input:hover { border-color: rgba(255,255,255,0.15); }
-.sl-tittel-input:focus {
+.sl-tittel-input:hover,
+.sl-dato-input:hover { border-color: rgba(255,255,255,0.15); }
+.sl-tittel-input:focus,
+.sl-dato-input:focus {
   outline: none;
   background: rgba(0,0,0,0.2);
   border-color: var(--s1-accent, #f1c40f);

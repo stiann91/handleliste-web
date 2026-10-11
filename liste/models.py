@@ -8,6 +8,7 @@ class Handleliste(models.Model):
     """En delt handleliste. Den som har lenken (UUID-en), kan lese og endre den."""
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     tittel = models.CharField(max_length=100, blank=True, default="")
+    dato = models.DateField(null=True, blank=True)
     items = models.JSONField(default=list, blank=True)
     history = models.JSONField(default=list, blank=True)
     turer = models.JSONField(default=list, blank=True)

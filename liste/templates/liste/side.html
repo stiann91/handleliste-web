@@ -4,8 +4,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Handleliste</title>
+  <title>{{ og_tittel }}</title>
   <meta name="robots" content="noindex, nofollow">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="{{ og_tittel }}">
+  <meta property="og:description" content="Trykk for å se og redigere handlelisten sammen.">
+  <meta property="og:url" content="{{ request.build_absolute_uri }}">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="{{ og_tittel }}">
+  <meta name="twitter:description" content="Trykk for å se og redigere handlelisten sammen.">
   <link rel="stylesheet" href="{% static 'liste/liste.css' %}">
   <link rel="icon" href="{% static 'liste/icons/favicon.ico' %}" sizes="any">
   <link rel="icon" type="image/png" sizes="16x16" href="{% static 'liste/icons/favicon-16.png' %}">
@@ -155,9 +162,16 @@
         id="sl-tittel"
         class="sl-tittel-input"
         value="{{ tittel }}"
-        placeholder="HandlelisteNavn - dd/mm/yyyy"
+        placeholder="Handlelistenavn"
         maxlength="100"
         aria-label="Navn på handlelisten"
+      />
+      <input
+        type="date"
+        id="sl-dato"
+        class="sl-dato-input"
+        value="{{ dato_iso }}"
+        aria-label="Dato for handleturen"
       />
     </div>
 
