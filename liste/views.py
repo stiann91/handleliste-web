@@ -81,7 +81,7 @@ def statistikk(request):
 
 @require_POST
 def ny_liste(request):
-    standard_tittel = "Handleliste " + timezone.now().strftime("%d/%m/%Y")
+    standard_tittel = "HandlelisteNavn - " + timezone.now().strftime("%d/%m/%Y")
     liste = Handleliste.objects.create(tittel=standard_tittel)
     return redirect("side", lid=liste.id)
 
