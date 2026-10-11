@@ -33,6 +33,27 @@ h1 { font-size: 1.8rem; margin: 0 0 12px; }
 }
 .info-btn:hover { background: rgba(255,255,255,0.14); }
 
+.tittel-rad { max-width: 480px; margin: 0 0 12px; }
+.sl-tittel-input {
+  width: 100%;
+  font-size: 1.15rem;
+  font-weight: 600;
+  background: transparent;
+  color: #f0eee9;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 6px 8px;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+.sl-tittel-input::placeholder { color: rgba(240,238,233,0.5); }
+.sl-tittel-input:hover { border-color: rgba(255,255,255,0.15); }
+.sl-tittel-input:focus {
+  outline: none;
+  background: rgba(0,0,0,0.2);
+  border-color: var(--s1-accent, #f1c40f);
+}
+
 .del-card {
   max-width: 480px;
   margin: 0 0 16px;

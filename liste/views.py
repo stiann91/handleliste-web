@@ -81,18 +81,20 @@ def statistikk(request):
 
 @require_POST
 def ny_liste(request):
-    liste = Handleliste.objects.create()
+    standard_tittel = "Handleliste " + timezone.now().strftime("%d/%m/%Y")
+    liste = Handleliste.objects.create(tittel=standard_tittel)
     return redirect("side", lid=liste.id)
 
 
 @ensure_csrf_cookie
 @require_GET
 def side(request, lid):
-    if not Handleliste.objects.filter(pk=lid).exists():
+    liste = Handleliste.objects.filter(pk=lid).first()
+    if liste is None:
         return render(request, "liste/finnes_ikke.html", {"lid": lid}, status=404)
     _reaktiver(lid)
     _registrer_besok(request)
-    return render(request, "liste/side.html", {"lid": lid})
+    return render(request, "liste/side.html", {"lid": lid, "tittel": liste.tittel})
 
 
 @require_GET
@@ -102,7 +104,9 @@ def liste_hent(request, lid):
         return JsonResponse({"error": "Finnes ikke"}, status=404)
     _reaktiver(lid)
     _registrer_besok(request)
-    return JsonResponse({"items": liste.items, "history": liste.history, "turer": liste.turer})
+    return JsonResponse({
+        "items": liste.items, "history": liste.history, "turer": liste.turer, "tittel": liste.tittel,
+    })
 
 
 @require_POST
@@ -114,6 +118,7 @@ def liste_lagre(request, lid):
         items = payload.get("items")
         history = payload.get("history")
         turer = payload.get("turer", [])
+        tittel = payload.get("tittel", "")
         if not isinstance(items, list) or not isinstance(history, list):
             raise ValueError("items og history må være lister")
         if not isinstance(turer, list) or len(turer) > MAKS_TURER:
@@ -123,12 +128,13 @@ def liste_lagre(request, lid):
         items = [_rens_item(i) for i in items]
         history = [str(h)[:MAKS_TEKST] for h in history]
         turer = [_rens_tur(t) for t in turer]
+        tittel = str(tittel or "")[:100]
     except (ValueError, UnicodeDecodeError, AttributeError):
         return JsonResponse({"error": "Ugyldig innhold"}, status=400)
 
     nå = timezone.now()
     Handleliste.objects.filter(pk=lid).update(
-        items=items, history=history, turer=turer, oppdatert=nå, sist_sett=nå,
+        items=items, history=history, turer=turer, tittel=tittel, oppdatert=nå, sist_sett=nå,
         arkivert=False, arkivert_at=None,
     )
     _registrer_besok(request)

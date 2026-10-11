@@ -529,7 +529,8 @@ var ITEM_DB = {
         return {
           items: loadedItems,
           history: Array.isArray(data.history) ? data.history : [],
-          turer: loadedTurer
+          turer: loadedTurer,
+          tittel: typeof data.tittel === "string" ? data.tittel : ""
         };
       })
   }
@@ -547,7 +548,7 @@ var ITEM_DB = {
         "X-CSRFToken": getCookie("csrftoken"),
         "X-Enhet-ID": ENHET_ID
       },
-      body: JSON.stringify({ items: items, history: history, turer: turer })
+      body: JSON.stringify({ items: items, history: history, turer: turer, tittel: tittel })
     }).catch(function () {
       showToast("Kunne ikke lagre til serveren");
     });
@@ -557,6 +558,10 @@ var ITEM_DB = {
   var history = [];
   var turer = [];
   var stateLoaded = false;
+
+  var $tittelInput = document.getElementById("sl-tittel");
+  // Startverdien kommer fra serveren (unngår "blink" før fetchState svarer).
+  var tittel = $tittelInput ? $tittelInput.value : "";
 
   var $input = document.getElementById("sl-input");
   var $inputMulti = document.getElementById("sl-input-multi");
@@ -1151,8 +1156,32 @@ var ITEM_DB = {
     items = state.items;
     history = state.history;
     turer = state.turer || [];
+    // Ikke overskriv mens brukeren faktisk står og skriver i feltet.
+    if (document.activeElement !== $tittelInput) {
+      tittel = state.tittel || "";
+      if ($tittelInput) $tittelInput.value = tittel;
+    }
+    document.title = (tittel || "Handleliste") + " – Handleliste";
     stateLoaded = true;
     render();
+  }
+
+  if ($tittelInput) {
+    $tittelInput.addEventListener("blur", function () {
+      var ny = $tittelInput.value.trim().slice(0, 100);
+      $tittelInput.value = ny;
+      if (ny !== tittel) {
+        tittel = ny;
+        document.title = (tittel || "Handleliste") + " – Handleliste";
+        saveState();
+      }
+    });
+    $tittelInput.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        $tittelInput.blur();
+      }
+    });
   }
 
   // Ikke forstyrr brukeren midt i en handling: hopp over en automatisk
