@@ -4,7 +4,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Handleliste</title>
+  <title>Gratis handleliste app – del handleliste med familien | Handleliste</title>
+  <meta name="description" content="Lag en felles handleliste gratis og del den med familien eller samboeren din på sekunder. Ingen app å laste ned – bare lag en liste og del lenken.">
+  <link rel="canonical" href="https://handleliste.ginasbakeri.no/">
   <link rel="stylesheet" href="{% static 'liste/liste.css' %}">
   <link rel="icon" href="{% static 'liste/icons/favicon.ico' %}" sizes="any">
   <link rel="icon" type="image/png" sizes="16x16" href="{% static 'liste/icons/favicon-16.png' %}">
@@ -27,15 +29,61 @@
       }
     })();
   </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Handleliste",
+    "url": "https://handleliste.ginasbakeri.no",
+    "description": "Gratis nettbasert handleliste som enkelt kan deles med familie og samboere via lenke.",
+    "applicationCategory": "LifestyleApplication",
+    "operatingSystem": "Any",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "NOK"
+    },
+    "inLanguage": "nb-NO"
+  }
+  </script>
 </head>
 <body>
   <main class="wrap">
-    <h1>🛒 Handleliste</h1>
-    <p>Lag en liste og del lenken med dem du handler med.</p>
+    <h1>🛒 Lag og del handleliste gratis</h1>
+    <p>Handleliste er en enkel og gratis tjeneste for å lage en felles handleliste
+    som du kan dele med familien, samboeren eller hvem du handler med. Ingen
+    registrering, ingen app å laste ned – bare lag en liste og del lenken.</p>
     <form method="post" action="{% url 'ny' %}">
       {% csrf_token %}
       <button class="knapp" type="submit">Ny handleliste</button>
     </form>
+
+    <section class="seo-innhold">
+      <h2>Slik fungerer det</h2>
+      <ol>
+        <li>Trykk på «Ny handleliste»</li>
+        <li>Legg til varene dere trenger</li>
+        <li>Del lenken med den/de du handler med</li>
+        <li>Alle kan se og krysse av varer i sanntid</li>
+      </ol>
+
+      <h2>Ofte stilte spørsmål</h2>
+      <h3>Er handleliste-appen gratis?</h3>
+      <p>Ja, tjenesten er helt gratis å bruke.</p>
+
+      <h3>Må jeg laste ned noe?</h3>
+      <p>Nei, alt skjer i nettleseren. Du kan legge siden til på hjemskjermen
+      for rask tilgang, men det er ikke nødvendig.</p>
+
+      <h3>Hvordan deler jeg handlelisten med familien?</h3>
+      <p>Når du har laget en liste får du en unik lenke. Send den på SMS,
+      Messenger eller e-post, så kan alle du deler med se og redigere listen.</p>
+
+      <h3>Må alle ha en konto for å bruke listen?</h3>
+      <p>Nei, ingen konto er nødvendig. Lenken er alt som skal til.</p>
+
+      <p><a href="{% url 'om' %}">Les mer om hvordan siden er bygget →</a></p>
+    </section>
   </main>
 </body>
 </html>

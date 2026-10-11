@@ -1,7 +1,7 @@
 import json
 from datetime import timedelta
 
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.utils import timezone
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -141,3 +141,18 @@ def barcode_lookup(request, kode):
     if resultat is None:
         return JsonResponse({"funnet": False}, status=404)
     return JsonResponse({"funnet": True, **resultat})
+
+
+@require_GET
+def robots_txt(request):
+    """Blokkerer individuelle handlelister fra indeksering (de er private
+    og unike per bruker), men tillater forsiden og om-siden."""
+    linjer = [
+        "User-agent: *",
+        "Allow: /$",
+        "Allow: /om/$",
+        "Disallow: /liste/",
+        "",
+        "Sitemap: https://handleliste.ginasbakeri.no/sitemap.xml",
+    ]
+    return HttpResponse("\n".join(linjer), content_type="text/plain")
