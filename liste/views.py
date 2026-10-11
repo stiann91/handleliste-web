@@ -179,9 +179,38 @@ def barcode_lookup(request, kode):
 
 @require_GET
 def robots_txt(request):
-    """Blokkerer individuelle handlelister fra indeksering (de er private
-    og unike per bruker), men tillater forsiden og om-siden."""
+    """Blokkerer individuelle handlelister fra indeksering i søkemotorer (de er
+    private og unike per bruker), men gir sosiale medie-crawlere et eksplisitt
+    unntak slik at lenke-forhåndsvisninger (Facebook/Messenger, Twitter/X,
+    LinkedIn, Slack) fortsatt kan lese Open Graph-taggene."""
     linjer = [
+        "User-agent: facebookexternalhit",
+        "Allow: /",
+        "",
+        "User-agent: Facebot",
+        "Allow: /",
+        "",
+        "User-agent: Twitterbot",
+        "Allow: /",
+        "",
+        "User-agent: LinkedInBot",
+        "Allow: /",
+        "",
+        "User-agent: Slackbot",
+        "Allow: /",
+        "",
+        "User-agent: WhatsApp",
+        "Allow: /",
+        "",
+        "User-agent: TelegramBot",
+        "Allow: /",
+        "",
+        "User-agent: Discordbot",
+        "Allow: /",
+        "",
+        "User-agent: SkypeUriPreview",
+        "Allow: /",
+        "",
         "User-agent: *",
         "Allow: /$",
         "Allow: /om/$",
