@@ -5,7 +5,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.utils import timezone
 from django.views.decorators.csrf import ensure_csrf_cookie
-from django.views.decorators.http import require_GET, require_POST
+from django.views.decorators.http import require_GET, require_POST, require_safe
 
 from .barcode import slå_opp_strekkode
 from .models import Besok, Handleliste
@@ -106,7 +106,7 @@ def ny_liste(request):
 
 
 @ensure_csrf_cookie
-@require_GET
+@require_safe
 def side(request, lid):
     liste = Handleliste.objects.filter(pk=lid).first()
     if liste is None:
