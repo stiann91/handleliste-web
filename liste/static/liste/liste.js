@@ -22,6 +22,25 @@ var ENHET_ID = (function () {
 })();
 
 
+    (function () {
+      var toggleBtn = document.getElementById("toggle-share-btn");
+      var shareCard = document.getElementById("share");
+      if (!toggleBtn || !shareCard) return;
+
+      toggleBtn.addEventListener("click", function () {
+        // Bytter på om den skal være skjult eller vist
+        shareCard.hidden = !shareCard.hidden;
+        
+        // Valgfritt: Endre litt tekst/farge på knappen når den er aktiv
+        if (!shareCard.hidden) {
+          toggleBtn.style.background = "rgba(255,255,255,0.18)";
+        } else {
+          toggleBtn.style.background = "none";
+        }
+      });
+    })();
+
+
 (function () {
       var shareBtn = document.getElementById("sl-native-share");
       var linkText = document.getElementById("sl-link-text");
