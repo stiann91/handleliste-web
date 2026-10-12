@@ -9,6 +9,8 @@ body {
 }
 .wrap { max-width: 520px; margin: 0 auto; padding: 24px 16px 60px; }
 h1 { font-size: 1.8rem; margin: 0 0 12px; }
+
+
 .page-header {
   display: flex;
   justify-content: space-between;
@@ -20,14 +22,55 @@ h1 { font-size: 1.8rem; margin: 0 0 12px; }
 }
 .page-header h1 { margin: 0; }
 
+/* Ny beholder for knappene som håndterer flyt på mobil og PC */
+.page-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap; /* Holder knappene på samme linje så langt det går */
+}
+
+.share-buttons-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.share-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #f0eee9;
+  font-size: 0.8rem;
+  font-family: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.share-btn:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.share-native-btn {
+  background: rgba(241, 196, 15, 0.15);
+  border-color: rgba(241, 196, 15, 0.4);
+  font-weight: 600;
+}
+
 .info-btn {
   flex-shrink: 0;
-  padding: 8px 14px;
+  padding: 8px 12px;
   border-radius: 8px;
   background: rgba(255,255,255,0.08);
   border: 1px solid rgba(255,255,255,0.15);
   color: #f0eee9;
-  font-size: 0.8rem;
+  font-size: 0.75rem; /* Litt mindre tekst slik at det ikke tar for mye plass på små skjermer */
   text-decoration: none;
   white-space: nowrap;
 }

@@ -143,23 +143,43 @@
 </head>
 <body>
   <main class="wrap">
-    <div class="page-header">
-      <h1>🛒 Handleliste</h1>
-	  
-	<form method="post" action="{% url 'ny' %}" style="display:inline;">
-      {% csrf_token %}
-      <button type="submit" class="info-btn" style="background:none; border:none; cursor:pointer; font:inherit;">➕ Ny liste</button>
-    </form>
-      <button type="button" id="open-about-btn" class="info-btn" style="background:none; border:none; cursor:pointer; font:inherit;">ℹ️ Om siden</button>
-    </div>
 
-    <div class="del-card">
+	<div class="page-header">
+      <h1>🛒 Handleliste</h1>
+      <div class="page-header-actions">
+        <form method="post" action="{% url 'ny' %}" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit" class="info-btn" style="background:none; border:none; cursor:pointer; font:inherit;">➕ Ny liste</button>
+        </form>
+        <button type="button" id="open-about-btn" class="info-btn" style="background:none; border:none; cursor:pointer; font:inherit;">ℹ️ Om siden</button>
+      </div>
+    </div>
+	
+
+	
+	
+	<div class="del-card">
       <p class="del-label">Del denne lenken med de du handler med:</p>
       <div class="del-row">
         <code class="del-link" id="sl-link-text">{{ request.build_absolute_uri }}</code>
         <button id="sl-copy-link" class="btn-copy-link" type="button">Kopier Link</button>
       </div>
+      
+      <!-- Knapper for deling -->
+      <div class="share-buttons-row">
+        <!-- Vises kun på mobiler/enheter som støtter systemets delemeny -->
+        <button type="button" id="sl-native-share" class="share-btn share-native-btn" hidden>
+          📲 Del via apper...
+        </button>
+        
+        <!-- Standard direkte-lenker -->
+        <a href="sms:?&body=Se%20på%20handlelisten%20vår:%20{{ request.build_absolute_uri|urlencode }}" class="share-btn sms-btn">💬 SMS</a>
+        <a href="fb-messenger://share/?link={{ request.build_absolute_uri|urlencode }}" target="_blank" rel="noopener" class="share-btn messenger-btn">💙 Messenger</a>
+        <a href="mailto:?subject=Handleliste&body=Hei,%20her%20er%20handlelisten%20vår:%20{{ request.build_absolute_uri|urlencode }}" class="share-btn email-btn">📧 E-post</a>
+      </div>
     </div>
+	
+	
 
     <div class="tittel-rad">
       <input

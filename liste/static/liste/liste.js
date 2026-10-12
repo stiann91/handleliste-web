@@ -21,6 +21,32 @@ var ENHET_ID = (function () {
   }
 })();
 
+
+(function () {
+      var shareBtn = document.getElementById("sl-native-share");
+      var linkText = document.getElementById("sl-link-text");
+      if (!shareBtn || !linkText) return;
+
+      // Sjekk om enheten støtter Web Share API (f.eks. iPhone/Android)
+      if (navigator.share) {
+        shareBtn.hidden = false;
+        shareBtn.addEventListener("click", function () {
+          navigator.share({
+            title: "Handleliste",
+            text: "Se på handlelisten vår:",
+            url: linkText.textContent.trim()
+          }).catch(function (err) {
+            // Brukeren avbrøt delingen eller feil oppstod
+          });
+        });
+      }
+    })();
+
+
+
+
+
+
 // ── Handleliste (delt, lagret i rå JSON-fil på serveren) ──
 (function () {
   "use strict";
