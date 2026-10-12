@@ -764,10 +764,21 @@ var ITEM_DB = {
     showToast("Hentet tilbake " + tur.items.length + " varer");
   }
 
+  // Fjerner et evt. ikon (emoji) limt fast foran varenavnet, og en evt. "(Nx)"-mengde
+  // bakerst – begge deler kan oppstå hvis noen limer inn tekst som er kopiert fra selve
+  // listen (via "Kopier handleliste"-knappen, som formaterer som "ikon navn (Nx)").
+  var LEDENDE_IKON_REGEX = /^[\p{Extended_Pictographic}\uFE0F\u200D]+\s*/u;
+  var HENGENDE_MENGDE_REGEX = /\s*\(\d+x\)\s*$/i;
+  function rensVarenavn(navn) {
+    var rent = (navn || "").replace(LEDENDE_IKON_REGEX, "").replace(HENGENDE_MENGDE_REGEX, "").trim();
+    return rent || navn; // ikke tøm navnet helt hvis det (mot formodning) bare var ikon/mengde
+  }
+
   // Selve "legg til én vare"-logikken, uten lagring/rendring.
   // Brukes både for enkeltvarer og for hver vare i en bulk-innlegging,
   // slik at vi bare lagrer og rendrer én gang uansett hvor mange varer som legges til.
-  function leggTilEnVare(name) {
+  function leggTilEnVare(rawName) {
+    var name = rensVarenavn(rawName);
     var existing = items.find(function (i) { return i.name.toLowerCase() === name.toLowerCase(); });
     if (existing) {
       existing.qty += 1;
@@ -875,6 +886,7 @@ var ITEM_DB = {
       var li = document.createElement("li");
       var icon = guessIcon(m);
       li.innerHTML = (icon ? icon + " " : "") + escapeHtml(m);
+      li.dataset.name = m; // rått varenavn uten ikon, brukes ved valg (klikk og tastatur)
       li.addEventListener("mousedown", function (e) {
         e.preventDefault();
         addItem(m);
@@ -1068,7 +1080,7 @@ var ITEM_DB = {
     if (e.key === "Enter") {
       e.preventDefault();
       if (!$suggestions.hidden && activeSuggestionIndex >= 0 && visibleItems[activeSuggestionIndex]) {
-        addItem(visibleItems[activeSuggestionIndex].textContent);
+        addItem(visibleItems[activeSuggestionIndex].dataset.name);
       } else {
         addItem($input.value);
       }
