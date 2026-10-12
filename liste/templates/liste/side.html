@@ -169,13 +169,23 @@
       <div class="share-buttons-row">
         <!-- Vises kun på mobiler/enheter som støtter systemets delemeny -->
         <button type="button" id="sl-native-share" class="share-btn share-native-btn" hidden>
-          📲 Del via apper...
+          📲 Del via apper..
         </button>
         
         <!-- Standard direkte-lenker -->
         <a href="sms:?&body=Se%20på%20handlelisten%20vår:%20{{ request.build_absolute_uri|urlencode }}" class="share-btn sms-btn">💬 SMS</a>
-        <a href="fb-messenger://share/?link={{ request.build_absolute_uri|urlencode }}" target="_blank" rel="noopener" class="share-btn messenger-btn">💙 Messenger</a>
-        <a href="mailto:?subject=Handleliste&body=Hei,%20her%20er%20handlelisten%20vår:%20{{ request.build_absolute_uri|urlencode }}" class="share-btn email-btn">📧 E-post</a>
+        <a href="fb-messenger://share/?link={{ request.build_absolute_uri|urlencode }}" target="_blank" rel="noopener" class="share-btn messenger-btn">
+		<a href="fb-messenger://share/?link={{ request.build_absolute_uri|urlencode }}" target="_blank" rel="noopener" class="share-btn messenger-btn" title="Del på Messenger">
+    <svg class="share-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+      <path d="M12 2C6.477 2 2 6.145 2 11.258c0 2.51 1.01 4.787 2.646 6.438V22l3.65-2.004c1.07.297 2.215.46 3.404.46 5.523 0 10-4.145 10-9.258C21.7 6.145 17.223 2 12 2zm1.185 13.08l-2.73-2.91-5.334 2.91 5.862-6.225 2.73 2.91 5.334-2.91-5.862 6.225z"/>
+    </svg>
+    Messenger
+  </a></a>
+        <a href="mailto:?subject=Handleliste&body=Hei,%20her%20er%20handlelisten%20vår:%20{{ request.build_absolute_uri|urlencode }}" class="share-btn email-btn">
+		<svg class="share-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+      <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+    </svg>
+    E-post</a>
       </div>
     </div>
 	
