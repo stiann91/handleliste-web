@@ -15,19 +15,23 @@ h1 { font-size: 1.8rem; margin: 0 0 12px; }
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap; /* Lar knappene gå ned på ny linje hvis skjermen er for liten */
   gap: 12px;
   max-width: 480px;
   margin: 0 0 12px;
   box-sizing: border-box;
 }
-.page-header h1 { margin: 0; }
+.page-header h1 { 
+  margin: 0; 
+  flex-shrink: 0; /* Hindrer at tittel/ikon blir klemt sammen */
+}
 
-/* Ny beholder for knappene som håndterer flyt på mobil og PC */
+/* Beholder for knappene */
 .page-header-actions {
   display: flex;
   align-items: center;
   gap: 8px;
-  flex-wrap: nowrap; /* Holder knappene på samme linje så langt det går */
+  flex-wrap: wrap; /* Lar også knappene flytte seg pent om det trengs */
 }
 
 .share-buttons-row {
