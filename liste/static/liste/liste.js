@@ -53,11 +53,14 @@ var ENHET_ID = (function () {
     });
   }
 
-  // Klikk på "Skjul/vis navnet" i menyen
+  // Klikk på "Sett navn" i menyen (viser/skjuler tittel-raden)
   if (titleBtn && titleCard) {
     titleBtn.addEventListener("click", function () {
       titleCard.hidden = !titleCard.hidden;
       menu.hidden = true;
+      if (!titleCard.hidden) {
+        titleCard.scrollIntoView({ behavior: 'smooth' });
+      }
     });
   }
 
