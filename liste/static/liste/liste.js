@@ -29,7 +29,7 @@ var ENHET_ID = (function () {
   var shareCard = document.getElementById("share");
   
   var titleBtn = document.getElementById("toggle-title-btn");
-  var titleCard = document.getElementById("sl-tittel-card");
+  var titleCard = document.getElementById("name");
 
   var aboutBtn = document.getElementById("open-about-btn");
   var aboutModal = document.getElementById("about-modal");

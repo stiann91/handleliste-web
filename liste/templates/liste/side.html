@@ -199,23 +199,9 @@
 	
 	
 
-    <div class="tittel-rad" id="sl-tittel-card">
-      <input
-        type="text"
-        id="sl-tittel"
-        class="sl-tittel-input"
-        value="{{ tittel }}"
-        placeholder="Handlelistenavn"
-        maxlength="100"
-        aria-label="Navn på handlelisten"
-      />
-      <input
-        type="date"
-        id="sl-dato"
-        class="sl-dato-input"
-        value="{{ dato_iso }}"
-        aria-label="Dato for handleturen"
-      />
+    <div class="tittel-rad" id="name">
+      <input type="text" id="sl-tittel" class="sl-tittel-input" value="{{ tittel }}" placeholder="Handlelistenavn" maxlength="100" aria-label="Navn på handlelisten"/>
+      <input type="date" id="sl-dato" class="sl-dato-input" value="{{ dato_iso }}" aria-label="Dato for handleturen" />
     </div>
 
           <div class="sl-widget" id="sl-widget" data-liste-id="{{ lid }}">
