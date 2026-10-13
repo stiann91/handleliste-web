@@ -22,35 +22,50 @@ var ENHET_ID = (function () {
 })();
 
 
-	(function () {
-	  var menuBtn = document.getElementById("toggle-menu-btn");
-	  var menu = document.getElementById("main-menu");
-	  var shareBtn = document.getElementById("toggle-share-btn");
-	  var shareCard = document.getElementById("share");
+(function () {
+  var menuBtn = document.getElementById("toggle-menu-btn");
+  var menu = document.getElementById("main-menu");
+  var shareBtn = document.getElementById("menu-share-btn");
+  var shareCard = document.getElementById("share");
+  var aboutBtn = document.getElementById("menu-about-btn");
+  var aboutModal = document.getElementById("about-modal");
 
-	  if (!menuBtn || !menu) return;
+  if (!menuBtn || !menu) return;
 
-	  // Åpne/lukk menyen når man trykker på Meny-knappen
-	  menuBtn.addEventListener("click", function (e) {
-		e.stopPropagation();
-		menu.hidden = !menu.hidden;
-	  });
+  // Åpne/lukk menyen
+  menuBtn.addEventListener("click", function (e) {
+    e.stopPropagation();
+    menu.hidden = !menu.hidden;
+  });
 
-	  // Når man trykker på "Del liste" i menyen
-	  if (shareBtn && shareCard) {
-		shareBtn.addEventListener("click", function () {
-		  shareCard.hidden = !shareCard.hidden; // Viser/skjuler delingsboksen
-		  menu.hidden = true; // Lukker menyen
-		});
-	  }
+  // Klikk på "Del liste" i menyen
+  if (shareBtn && shareCard) {
+    shareBtn.addEventListener("click", function () {
+      shareCard.hidden = !shareCard.hidden; // Viser eller skjuler dele-boksen
+      menu.hidden = true; // Lukker menyen
+      // Scroll gjerne ned til dele-boksen hvis den åpnes
+      if (!shareCard.hidden) {
+        shareCard.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+  }
 
-	  // Lukker menyen automatisk hvis brukeren trykker utenfor
-	  document.addEventListener("click", function (e) {
-		if (!menu.hidden && !menu.contains(e.target) && e.target !== menuBtn) {
-		  menu.hidden = true;
-		}
-	  });
-	})();
+  // Klikk på "Om listen" i menyen
+  if (aboutBtn && aboutModal) {
+    aboutBtn.addEventListener("click", function () {
+      aboutModal.hidden = false;
+      document.body.style.overflow = "hidden";
+      menu.hidden = true;
+    });
+  }
+
+  // Lukk menyen hvis man trykker utenfor
+  document.addEventListener("click", function (e) {
+    if (!menu.hidden && !menu.contains(e.target) && e.target !== menuBtn) {
+      menu.hidden = true;
+    }
+  });
+})();
 
 
 
