@@ -22,79 +22,61 @@ var ENHET_ID = (function () {
 })();
 
 
-	  (function () {
-		var menuBtn = document.getElementById("toggle-menu-btn");
-		var menu = document.getElementById("main-menu");
-		var shareBtn = document.getElementById("toggle-share-btn");
-		var shareCard = document.getElementById("share");
-		
-		var titleBtn = document.getElementById("toggle-title-btn");
-		var titleCard = document.getElementById("sl-tittel-card");
-
-		var aboutBtn = document.getElementById("open-about-btn");
-		var aboutModal = document.getElementById("about-modal");
-
-		if (!menuBtn || !menu) return;
-
-		// Åpne/lukk menyen
-		menuBtn.addEventListener("click", function (e) {
-		  e.stopPropagation();
-		  menu.hidden = !menu.hidden;
-		});
-
-		// Klikk på "Del liste" i menyen
-		if (shareBtn && shareCard) {
-		  shareBtn.addEventListener("click", function () {
-			shareCard.hidden = !shareCard.hidden; 
-			menu.hidden = true; 
-			if (!shareCard.hidden) {
-			  shareCard.scrollIntoView({ behavior: 'smooth' });
-			}
-		  });
-		}
-
-		// Klikk på "Sett navn" i menyen (viser/skjuler tittel-raden)
-		if (titleBtn && titleCard) {
-		  titleBtn.addEventListener("click", function () {
-			titleCard.hidden = !titleCard.hidden;
-			menu.hidden = true;
-			if (!titleCard.hidden) {
-			  titleCard.scrollIntoView({ behavior: 'smooth' });
-			}
-		  });
-		}
-
-		// Klikk på "Om listen" i menyen
-		if (aboutBtn && aboutModal) {
-		  aboutBtn.addEventListener("click", function () {
-			aboutModal.hidden = false;
-			document.body.style.overflow = "hidden";
-			menu.hidden = true;
-		  });
-		}
-
-		// Lukk menyen hvis man trykker utenfor
-		document.addEventListener("click", function (e) {
-		  if (!menu.hidden && !menu.contains(e.target) && e.target !== menuBtn) {
-			menu.hidden = true;
-		  }
-		});
-	  })();
-
-    (function () {
-      var toggleBtn = document.getElementById("toggle-share-btn");
+(function () {
+      var menuBtn = document.getElementById("toggle-menu-btn");
+      var menu = document.getElementById("main-menu");
+      var shareBtn = document.getElementById("toggle-share-btn");
       var shareCard = document.getElementById("share");
-      if (!toggleBtn || !shareCard) return;
+      
+      var titleBtn = document.getElementById("toggle-title-btn");
+      var titleCard = document.getElementById("sl-tittel-card");
 
-      toggleBtn.addEventListener("click", function () {
-        // Bytter på om den skal være skjult eller vist
-        shareCard.hidden = !shareCard.hidden;
-        
-        // Valgfritt: Endre litt tekst/farge på knappen når den er aktiv
-        if (!shareCard.hidden) {
-          toggleBtn.style.background = "rgba(255,255,255,0.18)";
-        } else {
-          toggleBtn.style.background = "none";
+      var aboutBtn = document.getElementById("open-about-btn");
+      var aboutModal = document.getElementById("about-modal");
+
+      if (!menuBtn || !menu) return;
+
+      // Åpne/lukk hovedmenyen
+      menuBtn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        menu.hidden = !menu.hidden;
+      });
+
+      // Klikk på "Del liste" i menyen
+      if (shareBtn && shareCard) {
+        shareBtn.addEventListener("click", function () {
+          shareCard.hidden = !shareCard.hidden; 
+          menu.hidden = true; 
+          if (!shareCard.hidden) {
+            shareCard.scrollIntoView({ behavior: 'smooth' });
+          }
+        });
+      }
+
+      // Klikk på "Sett navn" i menyen (viser/skjuler tittel-raden)
+      if (titleBtn && titleCard) {
+        titleBtn.addEventListener("click", function () {
+          titleCard.hidden = !titleCard.hidden;
+          menu.hidden = true;
+          if (!titleCard.hidden) {
+            titleCard.scrollIntoView({ behavior: 'smooth' });
+          }
+        });
+      }
+
+      // Klikk på "Om listen" i menyen
+      if (aboutBtn && aboutModal) {
+        aboutBtn.addEventListener("click", function () {
+          aboutModal.hidden = false;
+          document.body.style.overflow = "hidden";
+          menu.hidden = true;
+        });
+      }
+
+      // Lukk menyen hvis man trykker utenfor
+      document.addEventListener("click", function (e) {
+        if (!menu.hidden && !menu.contains(e.target) && e.target !== menuBtn) {
+          menu.hidden = true;
         }
       });
     })();
