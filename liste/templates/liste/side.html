@@ -216,58 +216,61 @@
       />
     </div>
 
-          <div class="sl-widget" id="sl-widget" data-liste-id="{{ lid }}">
-		  
-		  <ul id="sl-list" class="sl-list"></ul>
+          <div id="sl-widget" data-liste-id="{{ lid }}">
+			  <div class="sl-widget">
+			  <ul id="sl-list" class="sl-list"></ul>
 
-            <p id="sl-empty" class="sl-empty">Handlelisten er tom. Skriv noe over for å legge til.</p>
+				<p id="sl-empty" class="sl-empty">Handlelisten er tom. Skriv noe over for å legge til.</p>
 
-            <div class="sl-actions">
-              <button id="sl-copy" class="sl-btn sl-btn-ghost" type="button">Kopier handleliste</button>
-              <button id="sl-clear" class="sl-btn sl-btn-danger" type="button">Tøm listen</button>
-            </div>
-		  
-		  
-            <div class="sl-inputrow">
-              <div class="sl-input-wrap">
-                <input
-                  type="text"
-                  id="sl-input"
-                  class="sl-input"
-                  placeholder="Legg til vare …"
-                  autocomplete="off"
-                />
-                <textarea
-                  id="sl-input-multi"
-                  class="sl-input sl-input-multi"
-                  placeholder="Lim inn flere varer, én per linje eller skilt med komma …"
-                  rows="4"
-                  hidden
-                ></textarea>
-                <ul id="sl-suggestions" class="sl-suggestions" hidden></ul>
-              </div>
-              <button id="sl-add" class="sl-btn sl-btn-add" type="button">Legg til</button>
-            </div>
-            <button id="sl-multi-toggle" class="sl-btn sl-btn-ghost sl-multi-toggle-btn" type="button">📋 Lim inn flere varer</button>
+				<div class="sl-actions">
+				  <button id="sl-copy" class="sl-btn sl-btn-ghost" type="button">Kopier handleliste</button>
+				  <button id="sl-clear" class="sl-btn sl-btn-danger" type="button">Tøm listen</button>
+				</div>
+			  
+			  </div>
+			  <div class="sl-widget">
+			  
+				<div class="sl-inputrow">
+				  <div class="sl-input-wrap">
+					<input
+					  type="text"
+					  id="sl-input"
+					  class="sl-input"
+					  placeholder="Legg til vare …"
+					  autocomplete="off"
+					/>
+					<textarea
+					  id="sl-input-multi"
+					  class="sl-input sl-input-multi"
+					  placeholder="Lim inn flere varer, én per linje eller skilt med komma …"
+					  rows="4"
+					  hidden
+					></textarea>
+					<ul id="sl-suggestions" class="sl-suggestions" hidden></ul>
+				  </div>
+				  <button id="sl-add" class="sl-btn sl-btn-add" type="button">Legg til</button>
+				</div>
+				<button id="sl-multi-toggle" class="sl-btn sl-btn-ghost sl-multi-toggle-btn" type="button">📋 Lim inn flere varer</button>
 
-            <div class="sl-divider"><span>eller</span></div>
-            <button id="sl-scan" class="sl-btn sl-btn-scan" type="button">║▌│█║ Skann strekkode</button>
+				<div class="sl-divider"><span>eller</span></div>
+				<button id="sl-scan" class="sl-btn sl-btn-scan" type="button">║▌│█║ Skann strekkode</button>
 
-            <div id="sl-scanner-wrap" class="sl-scanner-wrap" hidden>
-              <div id="sl-scanner"></div>
-              <div id="sl-scan-feedback" class="sl-scan-feedback" hidden>✓ Lagt til</div>
-              <button id="sl-scan-close" class="sl-scan-close-btn" type="button" aria-label="Lukk skanner">✕</button>
-            </div>
+				<div id="sl-scanner-wrap" class="sl-scanner-wrap" hidden>
+				  <div id="sl-scanner"></div>
+				  <div id="sl-scan-feedback" class="sl-scan-feedback" hidden>✓ Lagt til</div>
+				  <button id="sl-scan-close" class="sl-scan-close-btn" type="button" aria-label="Lukk skanner">✕</button>
+				</div>
 
 
 
-            <div id="sl-turer" class="sl-turer-section" hidden>
-              <p class="sl-turer-tittel">Tidligere handleturer</p>
-              <ul id="sl-turer-list" class="sl-turer-list"></ul>
-            </div>
+				<div id="sl-turer" class="sl-turer-section" hidden>
+				  <p class="sl-turer-tittel">Tidligere handleturer</p>
+				  <ul id="sl-turer-list" class="sl-turer-list"></ul>
+				</div>
 
-            <div id="sl-toast" class="sl-toast" role="status" aria-live="polite"></div>
-          </div>
+				<div id="sl-toast" class="sl-toast" role="status" aria-live="polite"></div>
+			  </div>
+		  </div>
 
   </main>
 
