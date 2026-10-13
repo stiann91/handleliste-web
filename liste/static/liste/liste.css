@@ -83,7 +83,6 @@ h1 { font-size: 1.8rem; margin: 0 0 12px; }
   background: rgba(255, 255, 255, 0.1);
 }
 
-
 .share-buttons-row {
   display: flex;
   gap: 8px;
@@ -129,6 +128,13 @@ h1 { font-size: 1.8rem; margin: 0 0 12px; }
   white-space: nowrap;
 }
 .info-btn:hover { background: rgba(255,255,255,0.14); }
+
+
+.del-card[hidden], .tittel-rad[hidden] {
+  display: none !important;
+}
+
+
 
 .tittel-rad {
   max-width: 480px;
