@@ -82,6 +82,9 @@ h1 { font-size: 1.8rem; margin: 0 0 12px; }
 .menu-dropdown-item:hover {
   background: rgba(255, 255, 255, 0.1);
 }
+.menu-dropdown-item:active {
+  background: rgba(255, 255, 255, 0.1);
+}
 
 .share-buttons-row {
   display: flex;
