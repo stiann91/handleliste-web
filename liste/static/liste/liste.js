@@ -30,6 +30,7 @@ var ENHET_ID = (function () {
       
       var titleBtn = document.getElementById("toggle-title-btn");
       var titleCard = document.getElementById("sl-tittel-card");
+	  if (titleCard) titleCard.hidden = true;
 
       var aboutBtn = document.getElementById("open-about-btn");
       var aboutModal = document.getElementById("about-modal");
