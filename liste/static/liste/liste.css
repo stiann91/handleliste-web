@@ -39,7 +39,6 @@ h1 { font-size: 1.8rem; margin: 0 0 12px; }
   position: relative;
   display: inline-block;
 }
-
 /* Selve nedtrekksmenyen */
 .menu-dropdown {
   position: absolute;
@@ -47,39 +46,41 @@ h1 { font-size: 1.8rem; margin: 0 0 12px; }
   right: 0;
   background: #2b1f17; /* Mørkere nyanse som passer til bakgrunnen */
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 6px;
-  min-width: 150px;
+  min-width: 160px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
   z-index: 100;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
 }
 
 .menu-dropdown[hidden] {
   display: none;
 }
 
-/* Valg inni menyen */
+/* Valg/lenker inni menyen – fjern rammer og gi en ren liste-look */
 .menu-dropdown-item {
   background: transparent;
   border: none;
+  border-radius: 8px;
   color: #f0eee9;
-  padding: 8px 12px;
+  padding: 10px 12px;
   text-align: left;
   font-family: inherit;
-  font-size: 0.85rem;
-  border-radius: 6px;
+  font-size: 0.9rem;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   width: 100%;
+  text-decoration: none;
+  box-sizing: border-box;
 }
 
 .menu-dropdown-item:hover {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 
