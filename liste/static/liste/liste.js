@@ -51,10 +51,7 @@ var ENHET_ID = (function () {
     if (!card) return;
     card.hidden = !card.hidden;
     menu.hidden = true;
-    if (!card.hidden) {
-      card.scrollIntoView({ behavior: 'smooth' });
-    }
-  }
+	}
 
   // Klikk på "Del liste"
   if (shareBtn && shareCard) {
