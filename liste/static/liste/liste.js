@@ -22,66 +22,64 @@ var ENHET_ID = (function () {
 })();
 
 
-(function () {
-  var menuBtn = document.getElementById("toggle-menu-btn");
-  var menu = document.getElementById("main-menu");
-  var shareBtn = document.getElementById("toggle-share-btn");
-  var shareCard = document.getElementById("share");
-  
-  var titleBtn = document.getElementById("toggle-title-btn");
-  var titleCard = document.getElementById("sl-tittel-card");
+	  (function () {
+		var menuBtn = document.getElementById("toggle-menu-btn");
+		var menu = document.getElementById("main-menu");
+		var shareBtn = document.getElementById("toggle-share-btn");
+		var shareCard = document.getElementById("share");
+		
+		var titleBtn = document.getElementById("toggle-title-btn");
+		var titleCard = document.getElementById("sl-tittel-card");
 
-  var aboutBtn = document.getElementById("open-about-btn");
-  var aboutModal = document.getElementById("about-modal");
+		var aboutBtn = document.getElementById("open-about-btn");
+		var aboutModal = document.getElementById("about-modal");
 
-  if (!menuBtn || !menu) return;
+		if (!menuBtn || !menu) return;
 
-  // Åpne/lukk menyen
-  menuBtn.addEventListener("click", function (e) {
-    e.stopPropagation();
-    menu.hidden = !menu.hidden;
-  });
+		// Åpne/lukk menyen
+		menuBtn.addEventListener("click", function (e) {
+		  e.stopPropagation();
+		  menu.hidden = !menu.hidden;
+		});
 
-  // Klikk på "Del liste" i menyen
-  if (shareBtn && shareCard) {
-    shareBtn.addEventListener("click", function () {
-      shareCard.hidden = !shareCard.hidden; 
-      menu.hidden = true; 
-      if (!shareCard.hidden) {
-        shareCard.scrollIntoView({ behavior: 'smooth' });
-      }
-    });
-  }
+		// Klikk på "Del liste" i menyen
+		if (shareBtn && shareCard) {
+		  shareBtn.addEventListener("click", function () {
+			shareCard.hidden = !shareCard.hidden; 
+			menu.hidden = true; 
+			if (!shareCard.hidden) {
+			  shareCard.scrollIntoView({ behavior: 'smooth' });
+			}
+		  });
+		}
 
-  // Klikk på "Sett navn" i menyen (viser/skjuler tittel-raden)
-  if (titleBtn && titleCard) {
-    titleBtn.addEventListener("click", function () {
-      titleCard.hidden = !titleCard.hidden;
-      menu.hidden = true;
-      if (!titleCard.hidden) {
-        titleCard.scrollIntoView({ behavior: 'smooth' });
-      }
-    });
-  }
+		// Klikk på "Sett navn" i menyen (viser/skjuler tittel-raden)
+		if (titleBtn && titleCard) {
+		  titleBtn.addEventListener("click", function () {
+			titleCard.hidden = !titleCard.hidden;
+			menu.hidden = true;
+			if (!titleCard.hidden) {
+			  titleCard.scrollIntoView({ behavior: 'smooth' });
+			}
+		  });
+		}
 
-  // Klikk på "Om listen" i menyen
-  if (aboutBtn && aboutModal) {
-    aboutBtn.addEventListener("click", function () {
-      aboutModal.hidden = false;
-      document.body.style.overflow = "hidden";
-      menu.hidden = true;
-    });
-  }
+		// Klikk på "Om listen" i menyen
+		if (aboutBtn && aboutModal) {
+		  aboutBtn.addEventListener("click", function () {
+			aboutModal.hidden = false;
+			document.body.style.overflow = "hidden";
+			menu.hidden = true;
+		  });
+		}
 
-  // Lukk menyen hvis man trykker utenfor
-  document.addEventListener("click", function (e) {
-    if (!menu.hidden && !menu.contains(e.target) && e.target !== menuBtn) {
-      menu.hidden = true;
-    }
-  });
-})();
-
-
+		// Lukk menyen hvis man trykker utenfor
+		document.addEventListener("click", function (e) {
+		  if (!menu.hidden && !menu.contains(e.target) && e.target !== menuBtn) {
+			menu.hidden = true;
+		  }
+		});
+	  })();
 
     (function () {
       var toggleBtn = document.getElementById("toggle-share-btn");
