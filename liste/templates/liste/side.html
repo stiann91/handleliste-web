@@ -217,6 +217,17 @@
     </div>
 
           <div class="sl-widget" id="sl-widget" data-liste-id="{{ lid }}">
+		  
+		  <ul id="sl-list" class="sl-list"></ul>
+
+            <p id="sl-empty" class="sl-empty">Handlelisten er tom. Skriv noe over for å legge til.</p>
+
+            <div class="sl-actions">
+              <button id="sl-copy" class="sl-btn sl-btn-ghost" type="button">Kopier handleliste</button>
+              <button id="sl-clear" class="sl-btn sl-btn-danger" type="button">Tøm listen</button>
+            </div>
+		  
+		  
             <div class="sl-inputrow">
               <div class="sl-input-wrap">
                 <input
@@ -248,14 +259,7 @@
               <button id="sl-scan-close" class="sl-scan-close-btn" type="button" aria-label="Lukk skanner">✕</button>
             </div>
 
-            <ul id="sl-list" class="sl-list"></ul>
 
-            <p id="sl-empty" class="sl-empty">Handlelisten er tom. Skriv noe over for å legge til.</p>
-
-            <div class="sl-actions">
-              <button id="sl-copy" class="sl-btn sl-btn-ghost" type="button">Kopier handleliste</button>
-              <button id="sl-clear" class="sl-btn sl-btn-danger" type="button">Tøm listen</button>
-            </div>
 
             <div id="sl-turer" class="sl-turer-section" hidden>
               <p class="sl-turer-tittel">Tidligere handleturer</p>
