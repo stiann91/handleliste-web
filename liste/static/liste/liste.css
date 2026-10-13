@@ -117,6 +117,19 @@ h1 { font-size: 1.8rem; margin: 0 0 12px; }
   font-weight: 600;
 }
 
+.info-btn {
+  flex-shrink: 0;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: #f0eee9;
+  font-size: 0.75rem; /* Litt mindre tekst slik at det ikke tar for mye plass på små skjermer */
+  text-decoration: none;
+  white-space: nowrap;
+}
+.info-btn:hover { background: rgba(255,255,255,0.14); }
+
 .tittel-rad {
   max-width: 480px;
   margin: 0 0 12px;
