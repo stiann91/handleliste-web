@@ -7,12 +7,17 @@
   <title>{{ og_tittel }}</title>
   <meta name="robots" content="noindex, nofollow">
   <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Handleliste">
   <meta property="og:title" content="{{ og_tittel }}">
   <meta property="og:description" content="Trykk for å se og redigere handlelisten sammen.">
   <meta property="og:url" content="{{ request.build_absolute_uri }}">
-  <meta name="twitter:card" content="summary">
+  <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'liste/icons/media.png' %}">
+  <meta property="og:image:width" content="513">
+  <meta property="og:image:height" content="393">
+  <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="{{ og_tittel }}">
   <meta name="twitter:description" content="Trykk for å se og redigere handlelisten sammen.">
+  <meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'liste/icons/media.png' %}">
   <link rel="stylesheet" href="{% static 'liste/liste.css' %}">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link rel="icon" href="{% static 'liste/icons/favicon.ico' %}" sizes="any">
