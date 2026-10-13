@@ -21,66 +21,71 @@ var ENHET_ID = (function () {
   }
 })();
 
-
 (function () {
-      var menuBtn = document.getElementById("toggle-menu-btn");
-      var menu = document.getElementById("main-menu");
-      var shareBtn = document.getElementById("toggle-share-btn");
-      var shareCard = document.getElementById("share");
-      
-      var titleBtn = document.getElementById("toggle-title-btn");
-      var titleCard = document.getElementById("sl-tittel-card");
-	  if (titleCard) titleCard.hidden = true;
+  var menuBtn = document.getElementById("toggle-menu-btn");
+  var menu = document.getElementById("main-menu");
+  
+  var shareBtn = document.getElementById("toggle-share-btn");
+  var shareCard = document.getElementById("share");
+  
+  var titleBtn = document.getElementById("toggle-title-btn");
+  var titleCard = document.getElementById("sl-tittel-card");
 
-      var aboutBtn = document.getElementById("open-about-btn");
-      var aboutModal = document.getElementById("about-modal");
+  var aboutBtn = document.getElementById("open-about-btn");
+  var aboutModal = document.getElementById("about-modal");
 
-      if (!menuBtn || !menu) return;
+  // Sørg for at både deling og tittel er skjult som standard ved oppstart
+  if (shareCard) shareCard.hidden = true;
+  if (titleCard) titleCard.hidden = true;
 
-      // Åpne/lukk hovedmenyen
-      menuBtn.addEventListener("click", function (e) {
-        e.stopPropagation();
-        menu.hidden = !menu.hidden;
-      });
+  if (!menuBtn || !menu) return;
 
-      // Klikk på "Del liste" i menyen
-      if (shareBtn && shareCard) {
-        shareBtn.addEventListener("click", function () {
-          shareCard.hidden = !shareCard.hidden; 
-          menu.hidden = true; 
-          if (!shareCard.hidden) {
-            shareCard.scrollIntoView({ behavior: 'smooth' });
-          }
-        });
-      }
+  // Åpne/lukk hovedmenyen
+  menuBtn.addEventListener("click", function (e) {
+    e.stopPropagation();
+    menu.hidden = !menu.hidden;
+  });
 
-      // Klikk på "Sett navn" i menyen (viser/skjuler tittel-raden)
-      if (titleBtn && titleCard) {
-        titleBtn.addEventListener("click", function () {
-          titleCard.hidden = !titleCard.hidden;
-          menu.hidden = true;
-          if (!titleCard.hidden) {
-            titleCard.scrollIntoView({ behavior: 'smooth' });
-          }
-        });
-      }
+  // Hjelpefunksjon for å håndtere "toggle" (vis/skjul) for kort
+  function toggleCard(card) {
+    if (!card) return;
+    card.hidden = !card.hidden;
+    menu.hidden = true;
+    if (!card.hidden) {
+      card.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
 
-      // Klikk på "Om listen" i menyen
-      if (aboutBtn && aboutModal) {
-        aboutBtn.addEventListener("click", function () {
-          aboutModal.hidden = false;
-          document.body.style.overflow = "hidden";
-          menu.hidden = true;
-        });
-      }
+  // Klikk på "Del liste"
+  if (shareBtn && shareCard) {
+    shareBtn.addEventListener("click", function () {
+      toggleCard(shareCard);
+    });
+  }
 
-      // Lukk menyen hvis man trykker utenfor
-      document.addEventListener("click", function (e) {
-        if (!menu.hidden && !menu.contains(e.target) && e.target !== menuBtn) {
-          menu.hidden = true;
-        }
-      });
-    })();
+  // Klikk på "Sett navn"
+  if (titleBtn && titleCard) {
+    titleBtn.addEventListener("click", function () {
+      toggleCard(titleCard);
+    });
+  }
+
+  // Klikk på "Om listen"
+  if (aboutBtn && aboutModal) {
+    aboutBtn.addEventListener("click", function () {
+      aboutModal.hidden = false;
+      document.body.style.overflow = "hidden";
+      menu.hidden = true;
+    });
+  }
+
+  // Lukk menyen hvis man trykker utenfor
+  document.addEventListener("click", function (e) {
+    if (!menu.hidden && !menu.contains(e.target) && e.target !== menuBtn) {
+      menu.hidden = true;
+    }
+  });
+})();
 
 
 (function () {
