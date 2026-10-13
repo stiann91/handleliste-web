@@ -28,7 +28,6 @@ var ENHET_ID = (function () {
   var shareBtn = document.getElementById("toggle-share-btn");
   var shareCard = document.getElementById("share");
   
-  // NYE elementer for skjuling av tittel
   var titleBtn = document.getElementById("toggle-title-btn");
   var titleCard = document.getElementById("sl-tittel-card");
 
@@ -54,18 +53,11 @@ var ENHET_ID = (function () {
     });
   }
 
-  // NY: Klikk på "Skjul/vis navnet" i menyen
+  // Klikk på "Skjul/vis navnet" i menyen
   if (titleBtn && titleCard) {
     titleBtn.addEventListener("click", function () {
       titleCard.hidden = !titleCard.hidden;
       menu.hidden = true;
-      
-      // Endre tekst på knappen avhengig av om raden er skjult eller vist
-      if (titleCard.hidden) {
-        titleBtn.textContent = "👁️ Vis navnet";
-      } else {
-        titleBtn.textContent = "👁️ Skjul navnet";
-      }
     });
   }
 

@@ -152,11 +152,11 @@
 			<div id="main-menu" class="menu-dropdown" hidden>
 			
 				<form method="post" action="{% url 'ny' %}" style="display:inline;">
-				{% csrf_token %}<button type="submit" class="menu-dropdown-item">➕ Ny list</button>
+				{% csrf_token %}<button type="submit" class="menu-dropdown-item"><i class="bi bi-file-earmark-plus"></i> Ny list</button>
 				</form>
-				<button type="button" id="toggle-title-btn" class="menu-dropdown-item">Sett navn</button>
-				<button type="button" id="toggle-share-btn" class="menu-dropdown-item">🔗 Del liste</button>
-				<button type="button" id="open-about-btn" class="menu-dropdown-item">ℹ️ Om listen</button>
+				<button type="button" id="toggle-title-btn" class="menu-dropdown-item"><i class="bi bi-fonts"></i> Sett navn</button>
+				<button type="button" id="toggle-share-btn" class="menu-dropdown-item"><i class="bi bi-link-45deg"></i> Del liste</button>
+				<button type="button" id="open-about-btn" class="menu-dropdown-item"><i class="bi bi-info-square"></i> Om listen</button>
 				
 			</div>
 			</div>
@@ -198,7 +198,7 @@
 	
 	
 
-    <div class="tittel-rad" id="sl-tittel-card">
+    <div class="tittel-rad" id="sl-tittel-card" hidden>
       <input
         type="text"
         id="sl-tittel"
@@ -224,8 +224,8 @@
 				<p id="sl-empty" class="sl-empty">Handlelisten er tom. Skriv noe over for å legge til.</p>
 
 				<div class="sl-actions">
-				  <button id="sl-copy" class="sl-btn sl-btn-ghost" type="button">Kopier handleliste</button>
-				  <button id="sl-clear" class="sl-btn sl-btn-danger" type="button">Tøm listen</button>
+				  <button id="sl-copy" class="sl-btn sl-btn-ghost" type="button"><i class="bi bi-clipboard-check"></i> Kopier handleliste</button>
+				  <button id="sl-clear" class="sl-btn sl-btn-danger" type="button"><i class="bi bi-floppy"></i> Tøm listen</button>
 				</div>
 			  
 			  </div>
