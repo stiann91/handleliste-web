@@ -25,9 +25,14 @@ var ENHET_ID = (function () {
 (function () {
   var menuBtn = document.getElementById("toggle-menu-btn");
   var menu = document.getElementById("main-menu");
-  var shareBtn = document.getElementById("menu-share-btn");
+  var shareBtn = document.getElementById("toggle-share-btn");
   var shareCard = document.getElementById("share");
-  var aboutBtn = document.getElementById("menu-about-btn");
+  
+  // NYE elementer for skjuling av tittel
+  var titleBtn = document.getElementById("toggle-title-btn");
+  var titleCard = document.getElementById("sl-tittel-card");
+
+  var aboutBtn = document.getElementById("open-about-btn");
   var aboutModal = document.getElementById("about-modal");
 
   if (!menuBtn || !menu) return;
@@ -41,11 +46,25 @@ var ENHET_ID = (function () {
   // Klikk på "Del liste" i menyen
   if (shareBtn && shareCard) {
     shareBtn.addEventListener("click", function () {
-      shareCard.hidden = !shareCard.hidden; // Viser eller skjuler dele-boksen
-      menu.hidden = true; // Lukker menyen
-      // Scroll gjerne ned til dele-boksen hvis den åpnes
+      shareCard.hidden = !shareCard.hidden; 
+      menu.hidden = true; 
       if (!shareCard.hidden) {
         shareCard.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+  }
+
+  // NY: Klikk på "Skjul/vis navnet" i menyen
+  if (titleBtn && titleCard) {
+    titleBtn.addEventListener("click", function () {
+      titleCard.hidden = !titleCard.hidden;
+      menu.hidden = true;
+      
+      // Endre tekst på knappen avhengig av om raden er skjult eller vist
+      if (titleCard.hidden) {
+        titleBtn.textContent = "👁️ Vis navnet";
+      } else {
+        titleBtn.textContent = "👁️ Skjul navnet";
       }
     });
   }
