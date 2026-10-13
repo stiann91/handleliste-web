@@ -22,6 +22,38 @@ var ENHET_ID = (function () {
 })();
 
 
+	(function () {
+	  var menuBtn = document.getElementById("toggle-menu-btn");
+	  var menu = document.getElementById("main-menu");
+	  var shareBtn = document.getElementById("toggle-share-btn");
+	  var shareCard = document.getElementById("share");
+
+	  if (!menuBtn || !menu) return;
+
+	  // Åpne/lukk menyen når man trykker på Meny-knappen
+	  menuBtn.addEventListener("click", function (e) {
+		e.stopPropagation();
+		menu.hidden = !menu.hidden;
+	  });
+
+	  // Når man trykker på "Del liste" i menyen
+	  if (shareBtn && shareCard) {
+		shareBtn.addEventListener("click", function () {
+		  shareCard.hidden = !shareCard.hidden; // Viser/skjuler delingsboksen
+		  menu.hidden = true; // Lukker menyen
+		});
+	  }
+
+	  // Lukker menyen automatisk hvis brukeren trykker utenfor
+	  document.addEventListener("click", function (e) {
+		if (!menu.hidden && !menu.contains(e.target) && e.target !== menuBtn) {
+		  menu.hidden = true;
+		}
+	  });
+	})();
+
+
+
     (function () {
       var toggleBtn = document.getElementById("toggle-share-btn");
       var shareCard = document.getElementById("share");
