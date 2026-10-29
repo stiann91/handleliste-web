@@ -12,6 +12,7 @@ class Handleliste(models.Model):
     items = models.JSONField(default=list, blank=True)
     history = models.JSONField(default=list, blank=True)
     turer = models.JSONField(default=list, blank=True)
+    logg = models.JSONField(default=list, blank=True)
     opprettet = models.DateTimeField(default=timezone.now)
     oppdatert = models.DateTimeField(default=timezone.now)
     sist_sett = models.DateTimeField(default=timezone.now, db_index=True)

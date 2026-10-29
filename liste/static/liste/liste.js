@@ -21,6 +21,38 @@ var ENHET_ID = (function () {
   }
 })();
 
+// Gjetter en lesbar enhetstype fra User-Agent, til bruk i aktivitetsloggen.
+function gjettEnhetstype() {
+  var ua = navigator.userAgent || "";
+  if (/iPad/i.test(ua)) return "iPad";
+  if (/iPhone/i.test(ua)) return "iPhone";
+  if (/Android/i.test(ua)) return /Mobile/i.test(ua) ? "Android" : "Android (nettbrett)";
+  if (/Macintosh/i.test(ua)) return "Mac";
+  if (/Windows/i.test(ua)) return "PC";
+  if (/Linux/i.test(ua)) return "PC";
+  return "Ukjent enhet";
+}
+var ENHET_TYPE = gjettEnhetstype();
+
+// Kallenavn personen selv har skrevet inn, til bruk i aktivitetsloggen.
+// Lagres kun lokalt i denne nettleseren (ikke knyttet til noen konto).
+function hentBrukernavn() {
+  var navn = "";
+  try { navn = localStorage.getItem("handleliste_brukernavn") || ""; } catch (e) { /* ignorer */ }
+  return navn;
+}
+function settBrukernavn(navn) {
+  try { localStorage.setItem("handleliste_brukernavn", navn); } catch (e) { /* ignorer */ }
+}
+function spørOmBrukernavn() {
+  var forslag = window.prompt("Hva vil du at navnet ditt skal vises som i loggen?", hentBrukernavn());
+  if (forslag === null) return hentBrukernavn();
+  var trimmet = forslag.trim().slice(0, 40);
+  settBrukernavn(trimmet);
+  return trimmet;
+}
+var BRUKERNAVN = hentBrukernavn();
+
 (function () {
   var menuBtn = document.getElementById("toggle-menu-btn");
   var menu = document.getElementById("main-menu");
@@ -615,10 +647,16 @@ var ITEM_DB = {
             })
           };
         });
+        var loadedLogg = (Array.isArray(data.logg) ? data.logg : []).map(function (e) {
+          return {
+            navn: e.navn || "", enhet: e.enhet || "", vare: e.vare || "", tid: e.tid || ""
+          };
+        });
         return {
           items: loadedItems,
           history: Array.isArray(data.history) ? data.history : [],
           turer: loadedTurer,
+          logg: loadedLogg,
           tittel: typeof data.tittel === "string" ? data.tittel : "",
           dato: typeof data.dato === "string" ? data.dato : ""
         };
@@ -638,7 +676,7 @@ var ITEM_DB = {
         "X-CSRFToken": getCookie("csrftoken"),
         "X-Enhet-ID": ENHET_ID
       },
-      body: JSON.stringify({ items: items, history: history, turer: turer, tittel: tittel, dato: dato })
+      body: JSON.stringify({ items: items, history: history, turer: turer, logg: logg, tittel: tittel, dato: dato })
     }).catch(function () {
       showToast("Kunne ikke lagre til serveren");
     });
@@ -647,7 +685,12 @@ var ITEM_DB = {
   var items = [];
   var history = [];
   var turer = [];
+  var logg = [];
   var stateLoaded = false;
+
+  var $loggList = document.getElementById("sl-logg-list");
+  var $loggNavnBtn = document.getElementById("sl-logg-navn-btn");
+  var MAKS_LOGG = 30;
 
   var $tittelInput = document.getElementById("sl-tittel");
   var $datoInput = document.getElementById("sl-dato");
@@ -790,6 +833,57 @@ var ITEM_DB = {
 
     $empty.classList.toggle("sl-hidden", items.length > 0);
     renderTurer();
+    renderLogg();
+  }
+
+  function renderLogg() {
+    if (!$loggList) return;
+    $loggList.innerHTML = "";
+
+    if (logg.length === 0) {
+      var tom = document.createElement("li");
+      tom.className = "sl-logg-tom";
+      tom.textContent = "Ingen aktivitet ennå.";
+      $loggList.appendChild(tom);
+      return;
+    }
+
+    logg.forEach(function (e) {
+      var li = document.createElement("li");
+      li.className = "sl-logg-rad";
+
+      var hvem = document.createElement("span");
+      hvem.className = "sl-logg-hvem";
+      hvem.textContent = (e.navn || "Noen") + " (" + (e.enhet || "ukjent enhet") + ")";
+
+      var hva = document.createElement("span");
+      hva.className = "sl-logg-hva";
+      hva.textContent = "la til: " + e.vare;
+
+      var tid = document.createElement("span");
+      tid.className = "sl-logg-tid";
+      tid.textContent = e.tid || "";
+
+      li.appendChild(hvem);
+      li.appendChild(hva);
+      li.appendChild(tid);
+      $loggList.appendChild(li);
+    });
+  }
+
+  // Legger en oppføring øverst i aktivitetsloggen. varer er en liste med
+  // varenavn som nettopp ble lagt til (ett eller flere i samme handling).
+  function loggLeggTil(varer) {
+    if (!varer || varer.length === 0) return;
+    if (!BRUKERNAVN) BRUKERNAVN = spørOmBrukernavn();
+
+    logg.unshift({
+      navn: BRUKERNAVN || "Ukjent",
+      enhet: ENHET_TYPE,
+      vare: varer.join(", "),
+      tid: datoKlokkeslett()
+    });
+    logg = logg.slice(0, MAKS_LOGG);
   }
 
   function renderTurer() {
@@ -885,6 +979,7 @@ var ITEM_DB = {
     if (!name) return;
 
     leggTilEnVare(name);
+    loggLeggTil([name]);
     saveState();
 
     $input.value = "";
@@ -950,6 +1045,7 @@ var ITEM_DB = {
     if (navn.length === 0) return;
 
     navn.forEach(leggTilEnVare);
+    loggLeggTil(navn);
     saveState();
 
     $inputMulti.value = "";
@@ -1161,6 +1257,12 @@ var ITEM_DB = {
     });
   }
 
+  if ($loggNavnBtn) {
+    $loggNavnBtn.addEventListener("click", function () {
+      BRUKERNAVN = spørOmBrukernavn();
+    });
+  }
+
   $input.addEventListener("input", function () { showSuggestions($input.value); });
 
   $input.addEventListener("keydown", function (e) {
@@ -1260,6 +1362,7 @@ var ITEM_DB = {
     items = state.items;
     history = state.history;
     turer = state.turer || [];
+    logg = state.logg || [];
     // Ikke overskriv mens brukeren faktisk står og skriver/velger i feltet.
     if (document.activeElement !== $tittelInput) {
       tittel = state.tittel || "";

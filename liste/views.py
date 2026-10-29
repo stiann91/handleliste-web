@@ -13,6 +13,7 @@ from .models import Besok, Handleliste
 MAKS_ELEMENTER = 300
 MAKS_TEKST = 200
 MAKS_TURER = 5
+MAKS_LOGG = 30
 
 
 def _enhet_id(request):
@@ -59,6 +60,17 @@ def _rens_tur(t):
     return {
         "dato": str(t.get("dato") or "")[:40],
         "items": [_rens_item(v) for v in varer],
+    }
+
+
+def _rens_logg_oppføring(e):
+    if not isinstance(e, dict):
+        raise ValueError("Loggoppføring må være et objekt")
+    return {
+        "navn": str(e.get("navn") or "")[:40],
+        "enhet": str(e.get("enhet") or "")[:20],
+        "vare": str(e.get("vare") or "")[:200],
+        "tid": str(e.get("tid") or "")[:40],
     }
 
 
@@ -131,7 +143,7 @@ def liste_hent(request, lid):
     _registrer_besok(request)
     dato = liste.dato or liste.opprettet.date()
     return JsonResponse({
-        "items": liste.items, "history": liste.history, "turer": liste.turer,
+        "items": liste.items, "history": liste.history, "turer": liste.turer, "logg": liste.logg,
         "tittel": liste.tittel, "dato": dato.isoformat(),
     })
 
@@ -145,24 +157,28 @@ def liste_lagre(request, lid):
         items = payload.get("items")
         history = payload.get("history")
         turer = payload.get("turer", [])
+        logg = payload.get("logg", [])
         tittel = payload.get("tittel", "")
         dato = _rens_dato(payload.get("dato"))
         if not isinstance(items, list) or not isinstance(history, list):
             raise ValueError("items og history må være lister")
         if not isinstance(turer, list) or len(turer) > MAKS_TURER:
             raise ValueError("For mange turer")
+        if not isinstance(logg, list) or len(logg) > MAKS_LOGG:
+            raise ValueError("For mange loggoppføringer")
         if len(items) > MAKS_ELEMENTER or len(history) > MAKS_ELEMENTER:
             raise ValueError("For mange elementer")
         items = [_rens_item(i) for i in items]
         history = [str(h)[:MAKS_TEKST] for h in history]
         turer = [_rens_tur(t) for t in turer]
+        logg = [_rens_logg_oppføring(e) for e in logg][:MAKS_LOGG]
         tittel = str(tittel or "")[:100]
     except (ValueError, UnicodeDecodeError, AttributeError):
         return JsonResponse({"error": "Ugyldig innhold"}, status=400)
 
     nå = timezone.now()
     Handleliste.objects.filter(pk=lid).update(
-        items=items, history=history, turer=turer, tittel=tittel, dato=dato, oppdatert=nå, sist_sett=nå,
+        items=items, history=history, turer=turer, logg=logg, tittel=tittel, dato=dato, oppdatert=nå, sist_sett=nå,
         arkivert=False, arkivert_at=None,
     )
     _registrer_besok(request)

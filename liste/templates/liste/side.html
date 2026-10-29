@@ -130,6 +130,58 @@
     .sl-scan-feedback.sl-scan-feedback-vis {
       opacity: 1;
     }
+    .sl-logg-section {
+      margin-top: 24px;
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      padding-top: 16px;
+    }
+    .sl-logg-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .sl-logg-tittel {
+      margin: 0;
+      font-weight: 600;
+    }
+    .sl-logg-navn-btn {
+      background: none;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      color: inherit;
+    }
+    .sl-logg-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      max-height: 220px;
+      overflow-y: auto;
+    }
+    .sl-logg-rad {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 8px;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 0.85rem;
+    }
+    .sl-logg-hvem {
+      font-weight: 600;
+    }
+    .sl-logg-tid {
+      margin-left: auto;
+      opacity: 0.7;
+    }
+    .sl-logg-tom {
+      opacity: 0.7;
+      font-size: 0.85rem;
+      padding: 6px 0;
+    }
     .sl-scan-close-btn {
       position: absolute;
       top: 8px;
@@ -259,6 +311,14 @@
 				<div id="sl-turer" class="sl-turer-section" hidden>
 				  <p class="sl-turer-tittel">Tidligere handleturer</p>
 				  <ul id="sl-turer-list" class="sl-turer-list"></ul>
+				</div>
+
+				<div id="sl-logg" class="sl-logg-section">
+				  <div class="sl-logg-header">
+					<p class="sl-logg-tittel">Aktivitetslogg</p>
+					<button type="button" id="sl-logg-navn-btn" class="sl-logg-navn-btn">Endre navn</button>
+				  </div>
+				  <ul id="sl-logg-list" class="sl-logg-list"></ul>
 				</div>
 
 				<div id="sl-toast" class="sl-toast" role="status" aria-live="polite"></div>
