@@ -626,6 +626,67 @@ var ITEM_DB = {
   }
   function guessIcon(name) { return guessInfo(name).icon; }
 
+  // ── Autocorrect for søk/varenavn som havner i "Annet" ──
+  // Beregner Levenshtein-avstand (antall endringer) mellom to tekster,
+  // slik at vi kan finne det kjente ordet som ligner mest på det brukeren skrev.
+  function levenshteinAvstand(a, b) {
+    var m = a.length, n = b.length;
+    if (m === 0) return n;
+    if (n === 0) return m;
+
+    var forrige = new Array(n + 1);
+    var nåværende = new Array(n + 1);
+    for (var j = 0; j <= n; j++) forrige[j] = j;
+
+    for (var i = 1; i <= m; i++) {
+      nåværende[0] = i;
+      for (var j2 = 1; j2 <= n; j2++) {
+        var kost = a.charAt(i - 1) === b.charAt(j2 - 1) ? 0 : 1;
+        nåværende[j2] = Math.min(
+          forrige[j2] + 1,      // sletting
+          nåværende[j2 - 1] + 1, // innsetting
+          forrige[j2 - 1] + kost // erstatning
+        );
+      }
+      var tmp = forrige; forrige = nåværende; nåværende = tmp;
+    }
+    return forrige[n];
+  }
+
+  // Finner nærmeste kjente vare i ITEM_DB når et navn ikke matcher noe
+  // (dvs. havner i kategorien "annet"). Returnerer null hvis ingenting
+  // ligner nok til at det er verdt å spørre brukeren.
+  function finnAutocorrectForslag(name) {
+    var lower = (name || "").trim().toLowerCase();
+    if (!lower) return null;
+
+    var besteNøkkel = null;
+    var besteAvstand = Infinity;
+
+    for (var i = 0; i < ITEM_KEYS.length; i++) {
+      var key = ITEM_KEYS[i];
+      // Hvis dette uansett ville blitt funnet av substring-søket i guessInfo,
+      // ville ikke varen havnet i "annet" i utgangspunktet – hopp over.
+      if (lower.indexOf(key) !== -1) continue;
+
+      var avstand = levenshteinAvstand(lower, key);
+      // Tillat flere feil jo lengre ordet er, men aldri mer enn 3.
+      var maksAvstand = Math.max(1, Math.min(3, Math.ceil(key.length / 4)));
+
+      if (avstand <= maksAvstand && avstand < besteAvstand) {
+        besteAvstand = avstand;
+        besteNøkkel = key;
+      }
+    }
+
+    if (!besteNøkkel) return null;
+    return {
+      forslagsnavn: besteNøkkel,
+      icon: ITEM_DB[besteNøkkel][0],
+      category: ITEM_DB[besteNøkkel][1]
+    };
+  }
+
   function fetchState() {
     return fetch(GET_URL, { credentials: "same-origin", headers: { "X-Enhet-ID": ENHET_ID } })
       .then(function (res) { if (!res.ok) throw new Error("GET feilet"); return res.json(); })
@@ -711,6 +772,57 @@ var ITEM_DB = {
   var $toast = document.getElementById("sl-toast");
   var $turerSection = document.getElementById("sl-turer");
   var $turerList = document.getElementById("sl-turer-list");
+
+  // Popup for autocorrect-forslag ("mente du ...?")
+  var $autocorrectModal = document.getElementById("autocorrect-modal");
+  var $autocorrectText = document.getElementById("autocorrect-text");
+  var $autocorrectAcceptBtn = document.getElementById("autocorrect-accept-btn");
+  var $autocorrectDeclineBtn = document.getElementById("autocorrect-decline-btn");
+  var $autocorrectCloseBtn = document.getElementById("autocorrect-close-btn");
+  var autocorrectKø = []; // varer som nylig havnet i "annet" og venter på spørsmål til brukeren
+
+  function visNesteAutocorrectForslag() {
+    if (!$autocorrectModal) return;
+    if (!$autocorrectModal.hidden) return; // det står allerede en popup åpen
+    if (autocorrectKø.length === 0) return;
+
+    var neste = autocorrectKø.shift();
+    // Hvis varen er fjernet fra listen igjen før vi rakk å spørre, hopp videre.
+    if (items.indexOf(neste.item) === -1) {
+      visNesteAutocorrectForslag();
+      return;
+    }
+
+    var forslagIkon = neste.forslag.icon ? neste.forslag.icon + " " : "";
+    var kategoriNavn = CATEGORY_LABELS[neste.forslag.category] || neste.forslag.category;
+    $autocorrectText.textContent =
+      "Du la til «" + neste.item.name + "» under Annet & kassevarer. Mente du " +
+      forslagIkon + "«" + neste.forslag.forslagsnavn + "» (" + kategoriNavn + ")?";
+
+    $autocorrectAcceptBtn.onclick = function () {
+      neste.item.icon = neste.forslag.icon;
+      neste.item.category = neste.forslag.category;
+      saveState();
+      render();
+      lukkAutocorrectModal();
+    };
+    $autocorrectDeclineBtn.onclick = function () {
+      lukkAutocorrectModal();
+    };
+
+    $autocorrectModal.hidden = false;
+    document.body.style.overflow = "hidden";
+  }
+
+  function lukkAutocorrectModal() {
+    if ($autocorrectModal) $autocorrectModal.hidden = true;
+    document.body.style.overflow = "";
+    visNesteAutocorrectForslag(); // vis neste spørsmål i køen, hvis det er flere
+  }
+
+  if ($autocorrectCloseBtn) {
+    $autocorrectCloseBtn.addEventListener("click", lukkAutocorrectModal);
+  }
 
   var activeSuggestionIndex = -1;
 
@@ -967,7 +1079,15 @@ var ITEM_DB = {
       existing.qty += 1;
     } else {
       var info = guessInfo(name);
-      items.push({ name: name, icon: info.icon, category: info.category, qty: 1, plukket: false });
+      var nyVare = { name: name, icon: info.icon, category: info.category, qty: 1, plukket: false };
+      items.push(nyVare);
+
+      // Havnet varen i "annet" uten treff? Sjekk om noe kjent ligner nok
+      // til at det er verdt å spørre brukeren, og legg den i spørrekøen.
+      if (info.category === "annet") {
+        var forslag = finnAutocorrectForslag(name);
+        if (forslag) autocorrectKø.push({ item: nyVare, forslag: forslag });
+      }
     }
 
     var known = history.some(function (h) { return h.toLowerCase() === name.toLowerCase(); });
@@ -986,6 +1106,7 @@ var ITEM_DB = {
     hideSuggestions();
     render();
     $input.focus();
+    visNesteAutocorrectForslag();
   }
 
   // Fjerner kulepunkt/tall-prefiks fra starten av en linje, f.eks.
@@ -1053,6 +1174,7 @@ var ITEM_DB = {
     render();
 
     showToast(navn.length === 1 ? "La til 1 vare" : "La til " + navn.length + " varer");
+    visNesteAutocorrectForslag();
   }
 
   function showSuggestions(query) {

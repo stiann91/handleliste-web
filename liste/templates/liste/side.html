@@ -79,6 +79,21 @@
     .about-modal-content a {
       color: #6b4a35;
     }
+    .sl-autocorrect-content {
+      max-width: 420px;
+    }
+    .sl-autocorrect-content h2 {
+      margin-top: 0;
+    }
+    .sl-autocorrect-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+    .sl-autocorrect-actions .sl-btn {
+      flex: 1 1 auto;
+    }
     .sl-input-multi {
       width: 100%;
       min-height: 100px;
@@ -341,6 +356,18 @@
 		  </div>
 
   </main>
+
+  <div id="autocorrect-modal" class="about-modal" hidden>
+    <div class="about-modal-content sl-autocorrect-content" role="dialog" aria-modal="true" aria-labelledby="autocorrect-modal-title">
+      <button type="button" id="autocorrect-close-btn" class="about-modal-close" aria-label="Lukk">✕</button>
+      <h2 id="autocorrect-modal-title">🤔 Mente du dette?</h2>
+      <p id="autocorrect-text"></p>
+      <div class="sl-autocorrect-actions">
+        <button type="button" id="autocorrect-accept-btn" class="sl-btn sl-btn-add">Ja, bruk forslaget</button>
+        <button type="button" id="autocorrect-decline-btn" class="sl-btn sl-btn-ghost">Nei, behold som Annet</button>
+      </div>
+    </div>
+  </div>
 
   <div id="about-modal" class="about-modal" hidden>
     <div class="about-modal-content" role="dialog" aria-modal="true" aria-labelledby="about-modal-title">
