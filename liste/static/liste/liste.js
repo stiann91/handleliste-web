@@ -788,22 +788,44 @@ var ITEM_DB = {
 
     var neste = autocorrectKø.shift();
     // Hvis varen er fjernet fra listen igjen før vi rakk å spørre, hopp videre.
-    if (items.indexOf(neste.item) === -1) {
+    // (Sjekker på navn også, i tilfelle objektet ble byttet ut av en
+    // bakgrunnsoppdatering fra serveren mens den stod i kø.)
+    var finnesFortsatt = items.indexOf(neste.item) !== -1 || items.some(function (i) {
+      return i.name.toLowerCase() === neste.item.name.toLowerCase();
+    });
+    if (!finnesFortsatt) {
       visNesteAutocorrectForslag();
       return;
     }
 
     var forslagIkon = neste.forslag.icon ? neste.forslag.icon + " " : "";
-    var kategoriNavn = CATEGORY_LABELS[neste.forslag.category] || neste.forslag.category;
     $autocorrectText.textContent =
-      "Du la til «" + neste.item.name + "» under Annet & kassevarer. Mente du " +
-      forslagIkon + "«" + neste.forslag.forslagsnavn + "» (" + kategoriNavn + ")?";
+      forslagIkon + "Mente du «" + neste.forslag.forslagsnavn + "» i stedet for «" + neste.item.name + "»?";
+
+    $autocorrectAcceptBtn.textContent = "Ja, bruk «" + neste.forslag.forslagsnavn + "»";
+    $autocorrectDeclineBtn.textContent = "Nei, ikke korriger";
+
+    // Varen kan ha blitt erstattet av en oppdatering fra serveren mens popupen
+    // ventet (f.eks. hvis det tok litt tid før brukeren svarte), så vi finner
+    // den på nytt via navn i stedet for å stole på den gamle objektreferansen.
+    function finnMålVare() {
+      var idx = items.indexOf(neste.item);
+      if (idx !== -1) return idx;
+      return items.findIndex(function (i) {
+        return i.name.toLowerCase() === neste.item.name.toLowerCase();
+      });
+    }
 
     $autocorrectAcceptBtn.onclick = function () {
-      neste.item.icon = neste.forslag.icon;
-      neste.item.category = neste.forslag.category;
-      saveState();
-      render();
+      var idx = finnMålVare();
+      if (idx === -1) {
+        showToast("Fant ikke varen lenger – ble den fjernet?");
+      } else {
+        items[idx].icon = neste.forslag.icon;
+        items[idx].category = neste.forslag.category;
+        saveState();
+        render();
+      }
       lukkAutocorrectModal();
     };
     $autocorrectDeclineBtn.onclick = function () {

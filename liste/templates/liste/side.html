@@ -82,17 +82,43 @@
     .sl-autocorrect-content {
       max-width: 420px;
     }
-    .sl-autocorrect-content h2 {
-      margin-top: 0;
+    .sl-autocorrect-text {
+      margin-top: 4px;
+      font-size: 1.05rem;
+      line-height: 1.5;
     }
     .sl-autocorrect-actions {
       display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 16px;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 18px;
     }
-    .sl-autocorrect-actions .sl-btn {
-      flex: 1 1 auto;
+    /* Overstyrer "ghost"-stilen fra liste.css (laget for mørk bakgrunn) så
+       begge knappene er tydelig synlige inni den hvite popup-boksen. */
+    .sl-autocorrect-actions button.sl-btn {
+      width: 100%;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-sizing: border-box;
+    }
+    .sl-autocorrect-actions #autocorrect-accept-btn {
+      background: #3c7a4f;
+      border: 2px solid #3c7a4f;
+      color: #fff;
+    }
+    .sl-autocorrect-actions #autocorrect-accept-btn:hover {
+      background: #2f6140;
+    }
+    .sl-autocorrect-actions #autocorrect-decline-btn {
+      background: #fff;
+      border: 2px solid #999;
+      color: #2b2b2b;
+    }
+    .sl-autocorrect-actions #autocorrect-decline-btn:hover {
+      background: #f0f0f0;
     }
     .sl-input-multi {
       width: 100%;
@@ -358,13 +384,12 @@
   </main>
 
   <div id="autocorrect-modal" class="about-modal" hidden>
-    <div class="about-modal-content sl-autocorrect-content" role="dialog" aria-modal="true" aria-labelledby="autocorrect-modal-title">
+    <div class="about-modal-content sl-autocorrect-content" role="dialog" aria-modal="true" aria-describedby="autocorrect-text">
       <button type="button" id="autocorrect-close-btn" class="about-modal-close" aria-label="Lukk">✕</button>
-      <h2 id="autocorrect-modal-title">🤔 Mente du dette?</h2>
-      <p id="autocorrect-text"></p>
+      <p id="autocorrect-text" class="sl-autocorrect-text"></p>
       <div class="sl-autocorrect-actions">
         <button type="button" id="autocorrect-accept-btn" class="sl-btn sl-btn-add">Ja, bruk forslaget</button>
-        <button type="button" id="autocorrect-decline-btn" class="sl-btn sl-btn-ghost">Nei, behold som Annet</button>
+        <button type="button" id="autocorrect-decline-btn" class="sl-btn sl-btn-ghost">Nei, ikke korriger</button>
       </div>
     </div>
   </div>
