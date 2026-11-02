@@ -990,22 +990,27 @@ var ITEM_DB = {
       var li = document.createElement("li");
       li.className = "sl-logg-rad";
 
+      var topplinje = document.createElement("div");
+      topplinje.className = "sl-logg-topplinje";
+
       var hvem = document.createElement("span");
       hvem.className = "sl-logg-hvem";
       hvem.textContent = (e.navn || "Noen") + " (" + (e.enhet || "ukjent enhet") + ")";
+
+      var tid = document.createElement("span");
+      tid.className = "sl-logg-tid";
+      tid.textContent = e.tid || "";
+
+      topplinje.appendChild(hvem);
+      topplinje.appendChild(tid);
 
       var hva = document.createElement("span");
       hva.className = "sl-logg-hva";
       // Eldre logg-oppføringer har ikke feltet "handling" – de var alltid "la til".
       hva.textContent = (e.handling || "la til") + ": " + e.vare;
 
-      var tid = document.createElement("span");
-      tid.className = "sl-logg-tid";
-      tid.textContent = e.tid || "";
-
-      li.appendChild(hvem);
+      li.appendChild(topplinje);
       li.appendChild(hva);
-      li.appendChild(tid);
       $loggList.appendChild(li);
     });
   }
