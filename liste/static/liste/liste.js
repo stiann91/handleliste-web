@@ -876,7 +876,10 @@ var ITEM_DB = {
     minus.setAttribute("aria-label", "Færre " + item.name);
     minus.addEventListener("click", function () {
       item.qty -= 1;
-      if (item.qty < 1) items.splice(index, 1);
+      if (item.qty < 1) {
+        items.splice(index, 1);
+        loggFjernet(item.name);
+      }
       saveState();
       render();
     });
@@ -907,6 +910,7 @@ var ITEM_DB = {
     remove.textContent = "✕";
     remove.addEventListener("click", function () {
       items.splice(index, 1);
+      loggFjernet(item.name);
       saveState();
       render();
     });
@@ -992,7 +996,8 @@ var ITEM_DB = {
 
       var hva = document.createElement("span");
       hva.className = "sl-logg-hva";
-      hva.textContent = "la til: " + e.vare;
+      // Eldre logg-oppføringer har ikke feltet "handling" – de var alltid "la til".
+      hva.textContent = (e.handling || "la til") + ": " + e.vare;
 
       var tid = document.createElement("span");
       tid.className = "sl-logg-tid";
@@ -1005,19 +1010,43 @@ var ITEM_DB = {
     });
   }
 
-  // Legger en oppføring øverst i aktivitetsloggen. varer er en liste med
-  // varenavn som nettopp ble lagt til (ett eller flere i samme handling).
-  function loggLeggTil(varer) {
-    if (!varer || varer.length === 0) return;
+  // Legger en oppføring øverst i aktivitetsloggen. "handling" er verbet som
+  // vises foran (f.eks. "la til", "fjernet", "tømte listen"), "beskrivelse"
+  // er selve detaljen (varenavn, antall osv.).
+  function loggHendelse(handling, beskrivelse) {
+    if (!beskrivelse) return;
     if (!BRUKERNAVN) BRUKERNAVN = spørOmBrukernavn();
 
     logg.unshift({
       navn: BRUKERNAVN || "Ukjent",
       enhet: ENHET_TYPE,
-      vare: varer.join(", "),
+      handling: handling,
+      vare: beskrivelse,
       tid: datoKlokkeslett()
     });
     logg = logg.slice(0, MAKS_LOGG);
+  }
+
+  // Legger en oppføring øverst i aktivitetsloggen. varer er en liste med
+  // varenavn som nettopp ble lagt til (ett eller flere i samme handling).
+  function loggLeggTil(varer) {
+    if (!varer || varer.length === 0) return;
+    loggHendelse("la til", varer.join(", "));
+  }
+
+  function loggFjernet(varenavn) {
+    loggHendelse("fjernet", varenavn);
+  }
+
+  function loggTømt(antall) {
+    if (antall <= 0) return;
+    loggHendelse("tømte listen", antall + (antall === 1 ? " vare" : " varer"));
+  }
+
+  function loggHentetTilbake(turDato, antall) {
+    if (antall <= 0) return;
+    var beskrivelse = (turDato ? turDato + " – " : "") + antall + (antall === 1 ? " vare" : " varer");
+    loggHendelse("hentet tilbake", beskrivelse);
   }
 
   function renderTurer() {
@@ -1076,6 +1105,7 @@ var ITEM_DB = {
         items.push({ name: vare.name, icon: vare.icon, category: vare.category, qty: vare.qty, plukket: false });
       }
     });
+    loggHentetTilbake(tur.dato, tur.items.length);
     saveState();
     render();
     showToast("Hentet tilbake " + tur.items.length + " varer");
@@ -1496,6 +1526,7 @@ var ITEM_DB = {
     });
     turer = turer.slice(0, 5);
 
+    loggTømt(items.length);
     items = [];
     saveState();
     render();
