@@ -14,6 +14,7 @@ ALLOWED_HOSTS = [h for h in os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost,12
 CSRF_TRUSTED_ORIGINS = [o for o in os.environ.get("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(",") if o]
 
 INSTALLED_APPS = [
+    "django.contrib.sitemaps",
     "django.contrib.staticfiles",
     "liste",
 ]
