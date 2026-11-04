@@ -9,14 +9,14 @@
   <meta property="og:site_name" content="Handleliste">
   <meta property="og:locale" content="nb_NO">
   <meta property="og:title" content="{{ og_tittel }}">
-  <meta property="og:description" content="Trykk for å se og redigere handlelisten sammen. Sorterer automatisk etter butikkens kategorier – helt uten app eller registrering.">
+  <meta property="og:description" content="{% if modus == 'gjore' %}Trykk for å se og redigere gjørelisten sammen – helt uten app eller registrering.{% else %}Trykk for å se og redigere handlelisten sammen. Sorterer automatisk etter butikkens kategorier – helt uten app eller registrering.{% endif %}">
   <meta property="og:url" content="{{ request.build_absolute_uri }}">
   <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'liste/icons/media.png' %}">
   <meta property="og:image:width" content="513">
   <meta property="og:image:height" content="269">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="{{ og_tittel }}">
-  <meta name="twitter:description" content="Trykk for å se og redigere handlelisten sammen. Sorterer automatisk etter butikkens kategorier – helt uten app eller registrering.">
+  <meta name="twitter:description" content="{% if modus == 'gjore' %}Trykk for å se og redigere gjørelisten sammen – helt uten app eller registrering.{% else %}Trykk for å se og redigere handlelisten sammen. Sorterer automatisk etter butikkens kategorier – helt uten app eller registrering.{% endif %}">
   <meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'liste/icons/media.png' %}">
   <link rel="stylesheet" href="{% static 'liste/liste.css' %}">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -26,7 +26,7 @@
   <link rel="icon" type="image/png" sizes="48x48" href="{% static 'liste/icons/favicon-48.png' %}">
   <link rel="apple-touch-icon" href="{% static 'liste/icons/apple-touch-icon.png' %}">
   <link rel="manifest" href="{% static 'liste/icons/site.webmanifest' %}">
-  <meta name="theme-color" content="#6b4a35">
+  <meta name="theme-color" content="{% if modus == 'gjore' %}#2f6b45{% else %}#6b4a35{% endif %}" id="theme-color-meta">
   <style>
     .about-modal {
       position: fixed;
@@ -292,11 +292,11 @@
     }
   </style>
 </head>
-<body>
+<body class="{% if modus == 'gjore' %}mode-gjore{% endif %}">
   <main class="wrap">
 
 	<div class="page-header">
-		<h1><span class="cart-logo">🛒</span> Handleliste</h1>
+		<h1><span class="cart-logo" id="mode-icon">{% if modus == 'gjore' %}💪{% else %}🛒{% endif %}</span> <span id="mode-tittel">{% if modus == 'gjore' %}Gjøreliste{% else %}Handleliste{% endif %}</span></h1>
 		<div class="page-header-actions">
 			<div class="menu-dropdown-wrap">
 			<button type="button" id="toggle-menu-btn" class="info-btn">☰ Meny</button>
@@ -307,6 +307,9 @@
 				</form>
 				<button type="button" id="toggle-title-btn" class="menu-dropdown-item"><i class="bi bi-fonts"></i> Sett navn</button>
 				<button type="button" id="toggle-share-btn" class="menu-dropdown-item"><i class="bi bi-link-45deg"></i> Del liste</button>
+				<button type="button" id="toggle-modus-btn" class="menu-dropdown-item" data-modus="{{ modus }}">
+					{% if modus == 'gjore' %}<i class="bi bi-cart"></i> Bytt til handleliste{% else %}<i class="bi bi-list-check"></i> Bytt til gjøreliste{% endif %}
+				</button>
 				<button type="button" id="open-about-btn" class="menu-dropdown-item"><i class="bi bi-info-square"></i> Om listen</button>
 				
 			</div>
@@ -315,7 +318,7 @@
 	</div>
 
 	<div class="del-card" id="share">
-      <p class="del-label">Del denne lenken med de du handler med:</p>
+      <p class="del-label" id="del-label-tekst">{% if modus == 'gjore' %}Del denne lenken med de som skal gjøre oppgavene:{% else %}Del denne lenken med de du handler med:{% endif %}</p>
       <div class="del-row">
         <code class="del-link" id="sl-link-text">{{ request.build_absolute_uri }}</code>
         <button id="sl-copy-link" class="btn-copy-link" type="button">Kopier Link</button>
@@ -331,7 +334,7 @@
         </button>
         
         <!-- Standard direkte-lenker -->
-        <a href="sms:?&body=Se%20på%20handlelisten%20vår:%20{{ request.build_absolute_uri|urlencode }}" class="share-btn sms-btn">
+        <a href="sms:?&body=Se%20på%20{% if modus == 'gjore' %}gjørelisten{% else %}handlelisten{% endif %}%20vår:%20{{ request.build_absolute_uri|urlencode }}" class="share-btn sms-btn">
 <svg class="share-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
       <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.17L4 17.17V4h16v12z"/>
     </svg> SMS</a>
@@ -340,7 +343,7 @@
       <path d="M12 2C6.477 2 2 6.145 2 11.258c0 2.51 1.01 4.787 2.646 6.438V22l3.65-2.004c1.07.297 2.215.46 3.404.46 5.523 0 10-4.145 10-9.258C21.7 6.145 17.223 2 12 2zm1.185 13.08l-2.73-2.91-5.334 2.91 5.862-6.225 2.73 2.91 5.334-2.91-5.862 6.225z"/>
     </svg> Messenger
   </a>
-        <a href="mailto:?subject=Handleliste&body=Hei,%20her%20er%20handlelisten%20vår:%20{{ request.build_absolute_uri|urlencode }}" class="share-btn email-btn">
+        <a href="mailto:?subject={% if modus == 'gjore' %}Gjøreliste{% else %}Handleliste{% endif %}&body=Hei,%20her%20er%20{% if modus == 'gjore' %}gjørelisten{% else %}handlelisten{% endif %}%20vår:%20{{ request.build_absolute_uri|urlencode }}" class="share-btn email-btn">
 		<svg class="share-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
       <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
     </svg> E-post</a>
@@ -350,18 +353,18 @@
 	
 
     <div class="tittel-rad" id="name">
-      <input type="text" id="sl-tittel" class="sl-tittel-input" value="{{ tittel }}" placeholder="Handlelistenavn" maxlength="100" aria-label="Navn på handlelisten"/>
+      <input type="text" id="sl-tittel" class="sl-tittel-input" value="{{ tittel }}" placeholder="{% if modus == 'gjore' %}Gjørelistenavn{% else %}Handlelistenavn{% endif %}" maxlength="100" aria-label="Navn på listen"/>
       <input type="date" id="sl-dato" class="sl-dato-input" value="{{ dato_iso }}" aria-label="Dato for handleturen" />
     </div>
 
-          <div class="sl-widget" id="sl-widget" data-liste-id="{{ lid }}">
+          <div class="sl-widget" id="sl-widget" data-liste-id="{{ lid }}" data-modus="{{ modus }}">
 			  <div>
 			  <ul id="sl-list" class="sl-list"></ul>
 
-				<p id="sl-empty" class="sl-empty">Handlelisten er tom. Skriv noe over for å legge til.</p>
+				<p id="sl-empty" class="sl-empty">{% if modus == 'gjore' %}Gjørelisten er tom. Skriv noe over for å legge til.{% else %}Handlelisten er tom. Skriv noe over for å legge til.{% endif %}</p>
 
 				<div class="sl-actions">
-				  <button id="sl-copy" class="sl-btn sl-btn-ghost" type="button"><i class="bi bi-clipboard-check"></i> Kopier handleliste</button>
+				  <button id="sl-copy" class="sl-btn sl-btn-ghost" type="button"><i class="bi bi-clipboard-check"></i> <span id="sl-copy-tekst">{% if modus == 'gjore' %}Kopier gjøreliste{% else %}Kopier handleliste{% endif %}</span></button>
 				  <button id="sl-clear" class="sl-btn sl-btn-danger" type="button"><i class="bi bi-floppy"></i> Tøm listen</button>
 				</div>
 			  
@@ -374,13 +377,13 @@
 					  type="text"
 					  id="sl-input"
 					  class="sl-input"
-					  placeholder="Legg til vare …"
+					  placeholder="{% if modus == 'gjore' %}Legg til oppgave …{% else %}Legg til vare …{% endif %}"
 					  autocomplete="off"
 					/>
 					<textarea
 					  id="sl-input-multi"
 					  class="sl-input sl-input-multi"
-					  placeholder="Lim inn flere varer, én per linje eller skilt med komma …"
+					  placeholder="{% if modus == 'gjore' %}Lim inn flere oppgaver, én per linje eller skilt med komma …{% else %}Lim inn flere varer, én per linje eller skilt med komma …{% endif %}"
 					  rows="4"
 					  hidden
 					></textarea>
@@ -388,15 +391,17 @@
 				  </div>
 				  <button id="sl-add" class="sl-btn sl-btn-add" type="button">Legg til</button>
 				</div>
-				<button id="sl-multi-toggle" class="sl-btn sl-btn-ghost sl-multi-toggle-btn" type="button">📋 Lim inn flere varer</button>
+				<button id="sl-multi-toggle" class="sl-btn sl-btn-ghost sl-multi-toggle-btn" type="button">{% if modus == 'gjore' %}📋 Lim inn flere oppgaver{% else %}📋 Lim inn flere varer{% endif %}</button>
 
-				<div class="sl-divider"><span>eller</span></div>
-				<button id="sl-scan" class="sl-btn sl-btn-scan" type="button">║▌│█║ Skann strekkode</button>
+				<div id="sl-scan-section">
+				  <div class="sl-divider"><span>eller</span></div>
+				  <button id="sl-scan" class="sl-btn sl-btn-scan" type="button">║▌│█║ Skann strekkode</button>
 
-				<div id="sl-scanner-wrap" class="sl-scanner-wrap" hidden>
-				  <div id="sl-scanner"></div>
-				  <div id="sl-scan-feedback" class="sl-scan-feedback" hidden>✓ Lagt til</div>
-				  <button id="sl-scan-close" class="sl-scan-close-btn" type="button" aria-label="Lukk skanner">✕</button>
+				  <div id="sl-scanner-wrap" class="sl-scanner-wrap" hidden>
+					<div id="sl-scanner"></div>
+					<div id="sl-scan-feedback" class="sl-scan-feedback" hidden>✓ Lagt til</div>
+					<button id="sl-scan-close" class="sl-scan-close-btn" type="button" aria-label="Lukk skanner">✕</button>
+				  </div>
 				</div>
 
 

@@ -89,9 +89,10 @@ def _og_tittel(liste):
     """Teksten som vises som tittel når lenken deles, f.eks. i Facebook/iMessage."""
     dato = liste.dato or liste.opprettet.date()
     dato_str = dato.strftime("%d/%m/%Y")
+    etikett = "Gjøreliste" if liste.modus == "gjore" else "Handleliste"
     if liste.tittel:
-        return f"Handleliste for {liste.tittel} ({dato_str})"
-    return f"Handleliste ({dato_str})"
+        return f"{etikett} for {liste.tittel} ({dato_str})"
+    return f"{etikett} ({dato_str})"
 
 
 def om(request):
@@ -129,6 +130,7 @@ def side(request, lid):
     return render(request, "liste/side.html", {
         "lid": lid,
         "tittel": liste.tittel,
+        "modus": liste.modus,
         "dato_iso": dato.isoformat(),
         "og_tittel": _og_tittel(liste),
     })
@@ -144,7 +146,7 @@ def liste_hent(request, lid):
     dato = liste.dato or liste.opprettet.date()
     return JsonResponse({
         "items": liste.items, "history": liste.history, "turer": liste.turer, "logg": liste.logg,
-        "tittel": liste.tittel, "dato": dato.isoformat(),
+        "tittel": liste.tittel, "modus": liste.modus, "dato": dato.isoformat(),
     })
 
 
@@ -159,6 +161,9 @@ def liste_lagre(request, lid):
         turer = payload.get("turer", [])
         logg = payload.get("logg", [])
         tittel = payload.get("tittel", "")
+        modus = payload.get("modus", "handle")
+        if modus not in ("handle", "gjore"):
+            modus = "handle"
         dato = _rens_dato(payload.get("dato"))
         if not isinstance(items, list) or not isinstance(history, list):
             raise ValueError("items og history må være lister")
@@ -178,7 +183,8 @@ def liste_lagre(request, lid):
 
     nå = timezone.now()
     Handleliste.objects.filter(pk=lid).update(
-        items=items, history=history, turer=turer, logg=logg, tittel=tittel, dato=dato, oppdatert=nå, sist_sett=nå,
+        items=items, history=history, turer=turer, logg=logg, tittel=tittel, modus=modus,
+        dato=dato, oppdatert=nå, sist_sett=nå,
         arkivert=False, arkivert_at=None,
     )
     _registrer_besok(request)

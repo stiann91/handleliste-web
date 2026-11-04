@@ -153,6 +153,47 @@ var BRUKERNAVN = hentBrukernavn();
   var GET_URL = "/api/liste/" + LISTE_ID + "/";
   var SAVE_URL = "/api/liste/" + LISTE_ID + "/lagre/";
 
+  // "handle" = vanlig handleliste (varer, kategorier, skanning, autocomplete).
+  // "gjore" = gjøreliste (oppgaver) – samme motor, men enklere og grønn.
+  var MODUS = (document.getElementById("sl-widget").getAttribute("data-modus") === "gjore") ? "gjore" : "handle";
+
+  var ORD = {
+    handle: {
+      tittel: "Handleliste",
+      ikon: "🛒",
+      tema: "#6b4a35",
+      enentall: "vare",
+      flertall: "varer",
+      navnPlaceholder: "Handlelistenavn",
+      leggTilPlaceholder: "Legg til vare …",
+      leggTilFlerePlaceholder: "Lim inn flere varer, én per linje eller skilt med komma …",
+      multiKnapp: "📋 Lim inn flere varer",
+      tomListe: "Handlelisten er tom. Skriv noe over for å legge til.",
+      kopierKnapp: "Kopier handleliste",
+      tommBekreftelse: "Tøm hele handlelisten?",
+      delLabel: "Del denne lenken med de du handler med:",
+      fullførtHeader: "Plukket",
+      enkelHeader: null // bruk vanlig kategori-gruppering (CATEGORY_ORDER)
+    },
+    gjore: {
+      tittel: "Gjøreliste",
+      ikon: "💪",
+      tema: "#2f6b45",
+      enentall: "oppgave",
+      flertall: "oppgaver",
+      navnPlaceholder: "Gjørelistenavn",
+      leggTilPlaceholder: "Legg til oppgave …",
+      leggTilFlerePlaceholder: "Lim inn flere oppgaver, én per linje eller skilt med komma …",
+      multiKnapp: "📋 Lim inn flere oppgaver",
+      tomListe: "Gjørelisten er tom. Skriv noe over for å legge til.",
+      kopierKnapp: "Kopier gjøreliste",
+      tommBekreftelse: "Tøm hele gjørelisten?",
+      delLabel: "Del denne lenken med de som skal gjøre oppgavene:",
+      fullførtHeader: "Fullført",
+      enkelHeader: "Oppgaver" // alt havner i én gruppe, ingen butikk-kategorier
+    }
+  };
+
 // Kategorier i den rekkefølgen du går gjennom en typisk norsk dagligvarebutikk.
 var CATEGORY_ORDER = [
   "frukt_grønt",
@@ -616,6 +657,7 @@ var ITEM_DB = {
   var ITEM_KEYS = Object.keys(ITEM_DB).sort(function (a, b) { return b.length - a.length; });
 
   function guessInfo(name) {
+    if (MODUS === "gjore") return { icon: "📝", category: "oppgave" };
     var lower = name.toLowerCase();
     for (var i = 0; i < ITEM_KEYS.length; i++) {
       if (lower.indexOf(ITEM_KEYS[i]) !== -1) {
@@ -657,6 +699,7 @@ var ITEM_DB = {
   // (dvs. havner i kategorien "annet"). Returnerer null hvis ingenting
   // ligner nok til at det er verdt å spørre brukeren.
   function finnAutocorrectForslag(name) {
+    if (MODUS === "gjore") return null; // ingen autocorrect i gjøreliste-modus
     var lower = (name || "").trim().toLowerCase();
     if (!lower) return null;
 
@@ -719,6 +762,7 @@ var ITEM_DB = {
           turer: loadedTurer,
           logg: loadedLogg,
           tittel: typeof data.tittel === "string" ? data.tittel : "",
+          modus: (data.modus === "gjore") ? "gjore" : "handle",
           dato: typeof data.dato === "string" ? data.dato : ""
         };
       })
@@ -737,7 +781,7 @@ var ITEM_DB = {
         "X-CSRFToken": getCookie("csrftoken"),
         "X-Enhet-ID": ENHET_ID
       },
-      body: JSON.stringify({ items: items, history: history, turer: turer, logg: logg, tittel: tittel, dato: dato })
+      body: JSON.stringify({ items: items, history: history, turer: turer, logg: logg, tittel: tittel, modus: MODUS, dato: dato })
     }).catch(function () {
       showToast("Kunne ikke lagre til serveren");
     });
@@ -924,32 +968,55 @@ var ITEM_DB = {
 
   function render() {
     $list.innerHTML = "";
+    var o = ORD[MODUS];
 
-    // Grupper de ikke-plukkede varene etter kategori, i butikk-rekkefølge,
-    // alfabetisk sortert innad i hver gruppe. Dette er bare en visningsrekkefølge,
-    // den underliggende items-listen (og indeksene brukt i knappene) endres ikke.
-    CATEGORY_ORDER.forEach(function (cat) {
-      var indekser = [];
+    if (o.enkelHeader) {
+      // Gjøreliste-modus: ingen butikk-kategorier, bare én flat, alfabetisk liste.
+      var åpne = [];
       items.forEach(function (item, i) {
-        if (!item.plukket && (item.category || "annet") === cat) indekser.push(i);
+        if (!item.plukket) åpne.push(i);
       });
-      if (indekser.length === 0) return;
+      if (åpne.length > 0) {
+        åpne.sort(function (a, b) {
+          return items[a].name.localeCompare(items[b].name, "no");
+        });
 
-      indekser.sort(function (a, b) {
-        return items[a].name.localeCompare(items[b].name, "no");
+        var enkelHeaderEl = document.createElement("li");
+        enkelHeaderEl.className = "sl-group-header";
+        enkelHeaderEl.textContent = o.enkelHeader;
+        $list.appendChild(enkelHeaderEl);
+
+        åpne.forEach(function (i) {
+          $list.appendChild(buildItemRow(items[i], i));
+        });
+      }
+    } else {
+      // Grupper de ikke-plukkede varene etter kategori, i butikk-rekkefølge,
+      // alfabetisk sortert innad i hver gruppe. Dette er bare en visningsrekkefølge,
+      // den underliggende items-listen (og indeksene brukt i knappene) endres ikke.
+      CATEGORY_ORDER.forEach(function (cat) {
+        var indekser = [];
+        items.forEach(function (item, i) {
+          if (!item.plukket && (item.category || "annet") === cat) indekser.push(i);
+        });
+        if (indekser.length === 0) return;
+
+        indekser.sort(function (a, b) {
+          return items[a].name.localeCompare(items[b].name, "no");
+        });
+
+        var header = document.createElement("li");
+        header.className = "sl-group-header";
+        header.textContent = CATEGORY_LABELS[cat] || cat;
+        $list.appendChild(header);
+
+        indekser.forEach(function (i) {
+          $list.appendChild(buildItemRow(items[i], i));
+        });
       });
+    }
 
-      var header = document.createElement("li");
-      header.className = "sl-group-header";
-      header.textContent = CATEGORY_LABELS[cat] || cat;
-      $list.appendChild(header);
-
-      indekser.forEach(function (i) {
-        $list.appendChild(buildItemRow(items[i], i));
-      });
-    });
-
-    // Plukkede varer samles i en egen gruppe nederst, uavhengig av kategori.
+    // Plukkede/fullførte varer samles i en egen gruppe nederst, uavhengig av kategori.
     var plukkedeIndekser = [];
     items.forEach(function (item, i) {
       if (item.plukket) plukkedeIndekser.push(i);
@@ -961,7 +1028,7 @@ var ITEM_DB = {
 
       var plukketHeader = document.createElement("li");
       plukketHeader.className = "sl-group-header";
-      plukketHeader.textContent = "Plukket";
+      plukketHeader.textContent = o.fullførtHeader;
       $list.appendChild(plukketHeader);
 
       plukkedeIndekser.forEach(function (i) {
@@ -1045,12 +1112,12 @@ var ITEM_DB = {
 
   function loggTømt(antall) {
     if (antall <= 0) return;
-    loggHendelse("tømte listen", antall + (antall === 1 ? " vare" : " varer"));
+    loggHendelse("tømte listen", antall + " " + (antall === 1 ? ORD[MODUS].enentall : ORD[MODUS].flertall));
   }
 
   function loggHentetTilbake(turDato, antall) {
     if (antall <= 0) return;
-    var beskrivelse = (turDato ? turDato + " – " : "") + antall + (antall === 1 ? " vare" : " varer");
+    var beskrivelse = (turDato ? turDato + " – " : "") + antall + " " + (antall === 1 ? ORD[MODUS].enentall : ORD[MODUS].flertall);
     loggHendelse("hentet tilbake", beskrivelse);
   }
 
@@ -1113,7 +1180,7 @@ var ITEM_DB = {
     loggHentetTilbake(tur.dato, tur.items.length);
     saveState();
     render();
-    showToast("Hentet tilbake " + tur.items.length + " varer");
+    showToast("Hentet tilbake " + tur.items.length + " " + (tur.items.length === 1 ? ORD[MODUS].enentall : ORD[MODUS].flertall));
   }
 
   // Fjerner et evt. ikon (emoji) limt fast foran varenavnet, og en evt. "(Nx)"-mengde
@@ -1230,11 +1297,12 @@ var ITEM_DB = {
     hideSuggestions();
     render();
 
-    showToast(navn.length === 1 ? "La til 1 vare" : "La til " + navn.length + " varer");
+    showToast(navn.length === 1 ? "La til 1 " + ORD[MODUS].enentall : "La til " + navn.length + " " + ORD[MODUS].flertall);
     visNesteAutocorrectForslag();
   }
 
   function showSuggestions(query) {
+    if (MODUS === "gjore") { hideSuggestions(); return; } // ingen autocomplete i gjøreliste-modus
     var q = query.trim().toLowerCase();
     if (!q) { hideSuggestions(); return; }
 
@@ -1284,6 +1352,7 @@ var ITEM_DB = {
 
   // ── Strekkodeskanning ──
   var scanner = null;
+  var $scanSection = document.getElementById("sl-scan-section");
   var $scanBtn = document.getElementById("sl-scan");
   var $scanBox = document.getElementById("sl-scanner-wrap");
   var $scanFeedback = document.getElementById("sl-scan-feedback");
@@ -1423,14 +1492,14 @@ var ITEM_DB = {
         $inputMulti.value = "";
         $inputMulti.focus();
         $add.textContent = "Legg til alle";
-        $multiToggle.textContent = "✎ Én vare om gangen";
+        $multiToggle.textContent = "✎ Én " + ORD[MODUS].enentall + " om gangen";
       } else {
         $inputMulti.hidden = true;
         $inputMulti.value = "";
         $input.hidden = false;
         $input.value = "";
         $add.textContent = "Legg til";
-        $multiToggle.textContent = "📋 Lim inn flere varer";
+        $multiToggle.textContent = ORD[MODUS].multiKnapp;
         $input.focus();
       }
     });
@@ -1439,6 +1508,61 @@ var ITEM_DB = {
   if ($loggNavnBtn) {
     $loggNavnBtn.addEventListener("click", function () {
       BRUKERNAVN = spørOmBrukernavn();
+    });
+  }
+
+  // ── Toggle mellom Handleliste (🛒, brun bakgrunn) og Gjøreliste (💪, grønn bakgrunn) ──
+  // Samme motor/datamodell begge veier; gjøreliste-modus skrur bare av
+  // butikk-kategorisering, autocorrect og strekkodeskanning, og bytter ordlyd/farger.
+  function applyModusUI() {
+    var o = ORD[MODUS];
+
+    document.body.classList.toggle("mode-gjore", MODUS === "gjore");
+
+    var themeMeta = document.getElementById("theme-color-meta");
+    if (themeMeta) themeMeta.setAttribute("content", o.tema);
+
+    var modeIcon = document.getElementById("mode-icon");
+    if (modeIcon) modeIcon.textContent = o.ikon;
+    var modeTittel = document.getElementById("mode-tittel");
+    if (modeTittel) modeTittel.textContent = o.tittel;
+
+    var toggleBtn = document.getElementById("toggle-modus-btn");
+    if (toggleBtn) {
+      toggleBtn.innerHTML = (MODUS === "gjore")
+        ? '<i class="bi bi-cart"></i> Bytt til handleliste'
+        : '<i class="bi bi-list-check"></i> Bytt til gjøreliste';
+    }
+
+    if ($tittelInput) $tittelInput.placeholder = o.navnPlaceholder;
+    if ($input) $input.placeholder = o.leggTilPlaceholder;
+    if ($inputMulti) $inputMulti.placeholder = o.leggTilFlerePlaceholder;
+    if ($multiToggle && !flerModus) $multiToggle.textContent = o.multiKnapp;
+    if ($empty) $empty.textContent = o.tomListe;
+
+    var copyTekst = document.getElementById("sl-copy-tekst");
+    if (copyTekst) copyTekst.textContent = o.kopierKnapp;
+
+    var delLabel = document.getElementById("del-label-tekst");
+    if (delLabel) delLabel.textContent = o.delLabel;
+
+    // Ingen autocomplete/skanning i gjøreliste-modus.
+    if ($scanSection) $scanSection.hidden = (MODUS === "gjore");
+    if (MODUS === "gjore" && scanner) stopScan();
+    hideSuggestions();
+  }
+
+  var $modusToggleBtn = document.getElementById("toggle-modus-btn");
+  if ($modusToggleBtn) {
+    $modusToggleBtn.addEventListener("click", function () {
+      MODUS = (MODUS === "gjore") ? "handle" : "gjore";
+      applyModusUI();
+      document.title = (tittel || ORD[MODUS].tittel) + " – " + ORD[MODUS].tittel;
+      saveState();
+      render();
+      var meny = document.getElementById("main-menu");
+      if (meny) meny.hidden = true;
+      showToast(MODUS === "gjore" ? "Byttet til gjøreliste" : "Byttet til handleliste");
     });
   }
 
@@ -1520,7 +1644,7 @@ var ITEM_DB = {
 
   $clear.addEventListener("click", function () {
     if (items.length === 0) return;
-    var confirmed = window.confirm("Tøm hele handlelisten?");
+    var confirmed = window.confirm(ORD[MODUS].tommBekreftelse);
     if (!confirmed) return;
 
     turer.unshift({
@@ -1543,6 +1667,9 @@ var ITEM_DB = {
     history = state.history;
     turer = state.turer || [];
     logg = state.logg || [];
+    if (state.modus === "gjore" || state.modus === "handle") {
+      MODUS = state.modus;
+    }
     // Ikke overskriv mens brukeren faktisk står og skriver/velger i feltet.
     if (document.activeElement !== $tittelInput) {
       tittel = state.tittel || "";
@@ -1552,7 +1679,8 @@ var ITEM_DB = {
       dato = state.dato || "";
       if ($datoInput) $datoInput.value = dato;
     }
-    document.title = (tittel || "Handleliste") + " – Handleliste";
+    document.title = (tittel || ORD[MODUS].tittel) + " – " + ORD[MODUS].tittel;
+    applyModusUI();
     stateLoaded = true;
     render();
   }
@@ -1563,7 +1691,7 @@ var ITEM_DB = {
       $tittelInput.value = ny;
       if (ny !== tittel) {
         tittel = ny;
-        document.title = (tittel || "Handleliste") + " – Handleliste";
+        document.title = (tittel || ORD[MODUS].tittel) + " – " + ORD[MODUS].tittel;
         saveState();
       }
     });
