@@ -74,6 +74,30 @@ def _rens_logg_oppføring(e):
     }
 
 
+def _rens_modus_data(blokk):
+    """Validerer og renser items/history/turer/logg for én modus (handle eller gjore)."""
+    if not isinstance(blokk, dict):
+        raise ValueError("Ugyldig data for modus")
+    items = blokk.get("items")
+    history = blokk.get("history")
+    turer = blokk.get("turer", [])
+    logg = blokk.get("logg", [])
+    if not isinstance(items, list) or not isinstance(history, list):
+        raise ValueError("items og history må være lister")
+    if not isinstance(turer, list) or len(turer) > MAKS_TURER:
+        raise ValueError("For mange turer")
+    if not isinstance(logg, list) or len(logg) > MAKS_LOGG:
+        raise ValueError("For mange loggoppføringer")
+    if len(items) > MAKS_ELEMENTER or len(history) > MAKS_ELEMENTER:
+        raise ValueError("For mange elementer")
+    return {
+        "items": [_rens_item(i) for i in items],
+        "history": [str(h)[:MAKS_TEKST] for h in history],
+        "turer": [_rens_tur(t) for t in turer],
+        "logg": [_rens_logg_oppføring(e) for e in logg][:MAKS_LOGG],
+    }
+
+
 def _rens_dato(verdi):
     """Tar imot 'yyyy-mm-dd' (slik <input type=date> sender det) og returnerer en date,
     eller None hvis verdien mangler/er ugyldig."""
@@ -145,8 +169,16 @@ def liste_hent(request, lid):
     _registrer_besok(request)
     dato = liste.dato or liste.opprettet.date()
     return JsonResponse({
-        "items": liste.items, "history": liste.history, "turer": liste.turer, "logg": liste.logg,
-        "tittel": liste.tittel, "modus": liste.modus, "dato": dato.isoformat(),
+        "modus": liste.modus,
+        "tittel": liste.tittel,
+        "dato": dato.isoformat(),
+        "handle": {
+            "items": liste.items, "history": liste.history, "turer": liste.turer, "logg": liste.logg,
+        },
+        "gjore": {
+            "items": liste.items_gjore, "history": liste.history_gjore,
+            "turer": liste.turer_gjore, "logg": liste.logg_gjore,
+        },
     })
 
 
@@ -156,35 +188,23 @@ def liste_lagre(request, lid):
         return JsonResponse({"error": "Finnes ikke"}, status=404)
     try:
         payload = json.loads(request.body.decode("utf-8"))
-        items = payload.get("items")
-        history = payload.get("history")
-        turer = payload.get("turer", [])
-        logg = payload.get("logg", [])
-        tittel = payload.get("tittel", "")
+        tittel = str(payload.get("tittel") or "")[:100]
         modus = payload.get("modus", "handle")
         if modus not in ("handle", "gjore"):
             modus = "handle"
         dato = _rens_dato(payload.get("dato"))
-        if not isinstance(items, list) or not isinstance(history, list):
-            raise ValueError("items og history må være lister")
-        if not isinstance(turer, list) or len(turer) > MAKS_TURER:
-            raise ValueError("For mange turer")
-        if not isinstance(logg, list) or len(logg) > MAKS_LOGG:
-            raise ValueError("For mange loggoppføringer")
-        if len(items) > MAKS_ELEMENTER or len(history) > MAKS_ELEMENTER:
-            raise ValueError("For mange elementer")
-        items = [_rens_item(i) for i in items]
-        history = [str(h)[:MAKS_TEKST] for h in history]
-        turer = [_rens_tur(t) for t in turer]
-        logg = [_rens_logg_oppføring(e) for e in logg][:MAKS_LOGG]
-        tittel = str(tittel or "")[:100]
+        handle_data = _rens_modus_data(payload.get("handle") or {})
+        gjore_data = _rens_modus_data(payload.get("gjore") or {})
     except (ValueError, UnicodeDecodeError, AttributeError):
         return JsonResponse({"error": "Ugyldig innhold"}, status=400)
 
     nå = timezone.now()
     Handleliste.objects.filter(pk=lid).update(
-        items=items, history=history, turer=turer, logg=logg, tittel=tittel, modus=modus,
-        dato=dato, oppdatert=nå, sist_sett=nå,
+        items=handle_data["items"], history=handle_data["history"],
+        turer=handle_data["turer"], logg=handle_data["logg"],
+        items_gjore=gjore_data["items"], history_gjore=gjore_data["history"],
+        turer_gjore=gjore_data["turer"], logg_gjore=gjore_data["logg"],
+        tittel=tittel, modus=modus, dato=dato, oppdatert=nå, sist_sett=nå,
         arkivert=False, arkivert_at=None,
     )
     _registrer_besok(request)

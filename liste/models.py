@@ -16,10 +16,20 @@ class Handleliste(models.Model):
     tittel = models.CharField(max_length=100, blank=True, default="")
     modus = models.CharField(max_length=10, choices=MODUS_VALG, default="handle")
     dato = models.DateField(null=True, blank=True)
+
+    # Handleliste-siden (varer). Beholder opprinnelige feltnavn for å ikke
+    # kreve noen datamigrering av eksisterende lister.
     items = models.JSONField(default=list, blank=True)
     history = models.JSONField(default=list, blank=True)
     turer = models.JSONField(default=list, blank=True)
     logg = models.JSONField(default=list, blank=True)
+
+    # Gjøreliste-siden (oppgaver). Helt atskilt innhold fra handleliste-siden
+    # over, slik at de to modusene ikke blander varer og oppgaver.
+    items_gjore = models.JSONField(default=list, blank=True)
+    history_gjore = models.JSONField(default=list, blank=True)
+    turer_gjore = models.JSONField(default=list, blank=True)
+    logg_gjore = models.JSONField(default=list, blank=True)
     opprettet = models.DateTimeField(default=timezone.now)
     oppdatert = models.DateTimeField(default=timezone.now)
     sist_sett = models.DateTimeField(default=timezone.now, db_index=True)

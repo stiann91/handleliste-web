@@ -157,6 +157,13 @@ var BRUKERNAVN = hentBrukernavn();
   // "gjore" = gjøreliste (oppgaver) – samme motor, men enklere og grønn.
   var MODUS = (document.getElementById("sl-widget").getAttribute("data-modus") === "gjore") ? "gjore" : "handle";
 
+  // Handleliste og gjøreliste har helt atskilt innhold (varer blandes aldri med
+  // oppgaver). SHADOW holder data for den modusen som IKKE er aktiv akkurat nå;
+  // den aktive siden ligger i de vanlige items/history/turer/logg-variablene
+  // lenger nede, slik at all eksisterende kode kan bruke dem uendret.
+  var SHADOW = { handle: null, gjore: null };
+  function tomDataBlokk() { return { items: [], history: [], turer: [], logg: [] }; }
+
   var ORD = {
     handle: {
       tittel: "Handleliste",
@@ -173,6 +180,7 @@ var BRUKERNAVN = hentBrukernavn();
       tommBekreftelse: "Tøm hele handlelisten?",
       delLabel: "Del denne lenken med de du handler med:",
       fullførtHeader: "Plukket",
+      turerTittel: "Tidligere handleturer",
       enkelHeader: null // bruk vanlig kategori-gruppering (CATEGORY_ORDER)
     },
     gjore: {
@@ -190,6 +198,7 @@ var BRUKERNAVN = hentBrukernavn();
       tommBekreftelse: "Tøm hele gjørelisten?",
       delLabel: "Del denne lenken med de som skal gjøre oppgavene:",
       fullførtHeader: "Fullført",
+      turerTittel: "Tidligere gjørelister",
       enkelHeader: "Oppgaver" // alt havner i én gruppe, ingen butikk-kategorier
     }
   };
@@ -656,8 +665,9 @@ var ITEM_DB = {
 
   var ITEM_KEYS = Object.keys(ITEM_DB).sort(function (a, b) { return b.length - a.length; });
 
-  function guessInfo(name) {
-    if (MODUS === "gjore") return { icon: "📝", category: "oppgave" };
+  function guessInfo(name, modusOverride) {
+    var m = modusOverride || MODUS;
+    if (m === "gjore") return { icon: "📝", category: "oppgave" };
     var lower = name.toLowerCase();
     for (var i = 0; i < ITEM_KEYS.length; i++) {
       if (lower.indexOf(ITEM_KEYS[i]) !== -1) {
@@ -730,42 +740,59 @@ var ITEM_DB = {
     };
   }
 
+  // Normaliserer én modus' lagrede data (items/history/turer/logg) fra serveren.
+  function normaliserModusBlokk(blokk, modus) {
+    blokk = blokk || {};
+    var loadedItems = (Array.isArray(blokk.items) ? blokk.items : []).map(function (i) {
+      return {
+        name: i.name,
+        icon: typeof i.icon !== "undefined" ? i.icon : guessInfo(i.name, modus).icon,
+        category: i.category || guessInfo(i.name, modus).category,
+        qty: i.qty || 1,
+        plukket: !!i.plukket
+      };
+    });
+    var loadedTurer = (Array.isArray(blokk.turer) ? blokk.turer : []).map(function (t) {
+      return {
+        dato: t.dato || "",
+        items: (Array.isArray(t.items) ? t.items : []).map(function (i) {
+          return { name: i.name, icon: i.icon || "", category: i.category || "annet", qty: i.qty || 1 };
+        })
+      };
+    });
+    var loadedLogg = (Array.isArray(blokk.logg) ? blokk.logg : []).map(function (e) {
+      return {
+        navn: e.navn || "", enhet: e.enhet || "", vare: e.vare || "", tid: e.tid || ""
+      };
+    });
+    return {
+      items: loadedItems,
+      history: Array.isArray(blokk.history) ? blokk.history : [],
+      turer: loadedTurer,
+      logg: loadedLogg
+    };
+  }
+
   function fetchState() {
     return fetch(GET_URL, { credentials: "same-origin", headers: { "X-Enhet-ID": ENHET_ID } })
       .then(function (res) { if (!res.ok) throw new Error("GET feilet"); return res.json(); })
       .then(function (data) {
-        var loadedItems = (Array.isArray(data.items) ? data.items : []).map(function (i) {
-          return {
-            name: i.name,
-            icon: typeof i.icon !== "undefined" ? i.icon : guessInfo(i.name).icon,
-            category: i.category || guessInfo(i.name).category,
-            qty: i.qty || 1,
-            plukket: !!i.plukket
-          };
-        });
-        var loadedTurer = (Array.isArray(data.turer) ? data.turer : []).map(function (t) {
-          return {
-            dato: t.dato || "",
-            items: (Array.isArray(t.items) ? t.items : []).map(function (i) {
-              return { name: i.name, icon: i.icon || "", category: i.category || "annet", qty: i.qty || 1 };
-            })
-          };
-        });
-        var loadedLogg = (Array.isArray(data.logg) ? data.logg : []).map(function (e) {
-          return {
-            navn: e.navn || "", enhet: e.enhet || "", vare: e.vare || "", tid: e.tid || ""
-          };
-        });
         return {
-          items: loadedItems,
-          history: Array.isArray(data.history) ? data.history : [],
-          turer: loadedTurer,
-          logg: loadedLogg,
           tittel: typeof data.tittel === "string" ? data.tittel : "",
           modus: (data.modus === "gjore") ? "gjore" : "handle",
-          dato: typeof data.dato === "string" ? data.dato : ""
+          dato: typeof data.dato === "string" ? data.dato : "",
+          handle: normaliserModusBlokk(data.handle, "handle"),
+          gjore: normaliserModusBlokk(data.gjore, "gjore")
         };
       })
+  }
+
+  // Henter data for én modus til lagring: hvis det er den aktive modusen, brukes
+  // de "levende" items/history/turer/logg-variablene; ellers hentes den parkerte
+  // kopien fra SHADOW (eller en tom blokk om den aldri har hatt noe innhold).
+  function dataForLagring(modus) {
+    if (modus === MODUS) return { items: items, history: history, turer: turer, logg: logg };
+    return SHADOW[modus] || tomDataBlokk();
   }
 
   function saveState() {
@@ -781,7 +808,13 @@ var ITEM_DB = {
         "X-CSRFToken": getCookie("csrftoken"),
         "X-Enhet-ID": ENHET_ID
       },
-      body: JSON.stringify({ items: items, history: history, turer: turer, logg: logg, tittel: tittel, modus: MODUS, dato: dato })
+      body: JSON.stringify({
+        tittel: tittel,
+        modus: MODUS,
+        dato: dato,
+        handle: dataForLagring("handle"),
+        gjore: dataForLagring("gjore")
+      })
     }).catch(function () {
       showToast("Kunne ikke lagre til serveren");
     });
@@ -1546,6 +1579,9 @@ var ITEM_DB = {
     var delLabel = document.getElementById("del-label-tekst");
     if (delLabel) delLabel.textContent = o.delLabel;
 
+    var turerTittel = document.getElementById("sl-turer-tittel-tekst");
+    if (turerTittel) turerTittel.textContent = o.turerTittel;
+
     // Ingen autocomplete/skanning i gjøreliste-modus.
     if ($scanSection) $scanSection.hidden = (MODUS === "gjore");
     if (MODUS === "gjore" && scanner) stopScan();
@@ -1555,7 +1591,28 @@ var ITEM_DB = {
   var $modusToggleBtn = document.getElementById("toggle-modus-btn");
   if ($modusToggleBtn) {
     $modusToggleBtn.addEventListener("click", function () {
+      // Parker nåværende side sitt innhold, og hent frem den andre sidens
+      // EGEN tidligere lagrede data (eller tomt, hvis den aldri har hatt noe).
+      SHADOW[MODUS] = { items: items, history: history, turer: turer, logg: logg };
       MODUS = (MODUS === "gjore") ? "handle" : "gjore";
+      var lagret = SHADOW[MODUS] || tomDataBlokk();
+      items = lagret.items;
+      history = lagret.history;
+      turer = lagret.turer;
+      logg = lagret.logg;
+      SHADOW[MODUS] = null;
+      autocorrectKø = []; // ikke vis gamle "mente du...?"-spørsmål fra den andre listen
+
+      // Avbryt evt. "lim inn flere"-modus og lukk evt. åpen strekkodeskanner
+      // når man bytter, så man ikke står fast i et skjema som ikke lenger passer.
+      if (flerModus) {
+        flerModus = false;
+        $inputMulti.hidden = true;
+        $inputMulti.value = "";
+        $input.hidden = false;
+        $add.textContent = "Legg til";
+      }
+
       applyModusUI();
       document.title = (tittel || ORD[MODUS].tittel) + " – " + ORD[MODUS].tittel;
       saveState();
@@ -1663,13 +1720,19 @@ var ITEM_DB = {
   });
 
   function applyState(state) {
-    items = state.items;
-    history = state.history;
-    turer = state.turer || [];
-    logg = state.logg || [];
+    SHADOW.handle = state.handle || tomDataBlokk();
+    SHADOW.gjore = state.gjore || tomDataBlokk();
     if (state.modus === "gjore" || state.modus === "handle") {
       MODUS = state.modus;
     }
+    // Aktiver riktig side: items/history/turer/logg peker nå på den aktive
+    // modusens data, mens den andre siden blir liggende urørt i SHADOW.
+    var aktiv = SHADOW[MODUS];
+    items = aktiv.items;
+    history = aktiv.history;
+    turer = aktiv.turer;
+    logg = aktiv.logg;
+    SHADOW[MODUS] = null;
     // Ikke overskriv mens brukeren faktisk står og skriver/velger i feltet.
     if (document.activeElement !== $tittelInput) {
       tittel = state.tittel || "";
